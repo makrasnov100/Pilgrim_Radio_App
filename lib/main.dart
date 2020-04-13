@@ -3,6 +3,9 @@ import 'package:flutter_radio/flutter_radio.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart' as xml;
 
+import 'pages/channel_page.dart';
+import 'pages/contact_page.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -35,6 +38,13 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isPlaying = false;
   String streamURL = "http://37.187.112.164:8000/stream";
   String nowPlayingTitle = "Nothing";
+  int _currentIndex = 0;
+
+  final List<Widget> _tabChildren = [
+    ChannelPage(),
+    ChannelPage(),
+    ContactPage()
+  ];
 
   void playPauseRadio()
   {
@@ -74,6 +84,12 @@ class _MyHomePageState extends State<MyHomePage> {
     print('Audio Start OK');
   }
 
+  void onTabTapped(int index) {
+   setState(() {
+     _currentIndex = index;
+   });
+ }
+
   @override
   Widget build(BuildContext context) {
 
@@ -83,21 +99,21 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'Now Playing Song:',
-              ),
-              Text(
-                nowPlayingTitle,
-                style: Theme.of(context).textTheme.headline4,
-              ),
-              
-            ],
-          ),
-        ),
+        body: _tabChildren[_currentIndex], 
+        // Center(
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: <Widget>[
+        //       Text(
+        //         'Now Playing Song:',
+        //       ),
+        //       Text(
+        //         nowPlayingTitle,
+        //         style: Theme.of(context).textTheme.headline4,
+        //       ),
+        //     ],
+        //   ),
+        // ),
         floatingActionButton: FloatingActionButton(
           onPressed: playPauseRadio,
           tooltip: 'Play/Pause',
@@ -105,7 +121,8 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: Colors.greenAccent,
         ),
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 0, // this will be set when a new tab is tapped
+          currentIndex: _currentIndex,
+          onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.language),
