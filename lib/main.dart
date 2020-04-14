@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_radio/flutter_radio.dart';
-import 'package:http/http.dart' as http;
-import 'package:xml/xml.dart' as xml;
+import 'services/locator.dart';
 
 import 'pages/channel_page.dart';
 import 'pages/contact_page.dart';
@@ -11,16 +9,42 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+
+  MyApp()
+  {
+    setupSingleton();
+  }
+
+  
+  Map<int, Color> colorCodes = {
+    50: Color.fromRGBO(59, 61, 126, .1),
+    100: Color.fromRGBO(59, 61, 126, .2),
+    200: Color.fromRGBO(59, 61, 126, .3),
+    300: Color.fromRGBO(59, 61, 126, .4),
+    400: Color.fromRGBO(59, 61, 126, .5),
+    500: Color.fromRGBO(59, 61, 126, .6),
+    600: Color.fromRGBO(59, 61, 126, .7),
+    700: Color.fromRGBO(59, 61, 126, .8),
+    800: Color.fromRGBO(59, 61, 126, .9),
+    900: Color.fromRGBO(59, 61, 126, 1),
+  };
+
+
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    // Green color code: FF93cd48
+    MaterialColor customColor = MaterialColor(0xFF323d7e, colorCodes);
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: customColor,//Color.fromRGBO(50, 61, 126, 1.0),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'The Voice of Pilgrim'),
     );
   }
 }
@@ -35,91 +59,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool isPlaying = false;
-  String streamURL = "http://37.187.112.164:8000/stream";
-  String nowPlayingTitle = "Nothing";
+  //Tab Pages
   int _currentIndex = 0;
-
-  final List<Widget> _tabChildren = [
-    ChannelPage(),
-    ChannelPage(),
-    ContactPage()
-  ];
-
-  void playPauseRadio()
-  {
-    isPlaying = !isPlaying;
-    if(isPlaying)
-    {
-      FlutterRadio.play(url: streamURL);
-      print("started playing");
-    }
-    else
-    {
-      FlutterRadio.pause(url: streamURL);
-      print("stopped playing");
-    }
-  }
-
-  void nowPlayingUpdate() async
-  {
-    final response = await http.get("http://37.187.112.164:8000/stats");
-    final responceDoc = xml.parse(response.body);
-
-    setState(() {
-      nowPlayingTitle = responceDoc.findAllElements("SONGTITLE").single.text;
-
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    audioStart();
-    nowPlayingUpdate();
   }
 
-  Future<void> audioStart() async {
-    await FlutterRadio.audioStart();
-    print('Audio Start OK');
+  void onTabTapped(int index) async
+  {
+    setState(() {_currentIndex = index;});
   }
-
-  void onTabTapped(int index) {
-   setState(() {
-     _currentIndex = index;
-   });
- }
 
   @override
   Widget build(BuildContext context) {
-
-
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Center(
+            child: Text(widget.title,
+              textAlign: TextAlign.center,
+              ),
+          ),
         ),
-        body: _tabChildren[_currentIndex], 
-        // Center(
-        //   child: Column(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: <Widget>[
-        //       Text(
-        //         'Now Playing Song:',
-        //       ),
-        //       Text(
-        //         nowPlayingTitle,
-        //         style: Theme.of(context).textTheme.headline4,
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: playPauseRadio,
-          tooltip: 'Play/Pause',
-          child: Icon(Icons.play_arrow),
-          backgroundColor: Colors.greenAccent,
-        ),
+        body: Column(
+          children: [
+            Visibility(
+              visible: _currentIndex == 0,
+              child: ChannelPage(
+                streamURL: "http://37.187.112.164:8000/stream", 
+                statsURL: "http://37.187.112.164:8000/stats",
+              ),
+            ),
+            Visibility(
+              visible: _currentIndex == 1,
+              child: ChannelPage(
+                streamURL: "http://ca.rcast.net:8010/stream", 
+                statsURL: "http://ca.rcast.net:8010/stats",
+              )
+            ),
+            Visibility(
+              visible: _currentIndex == 2,
+              child: ContactPage(),
+            ),
+          ],
+        ), 
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: onTabTapped,
