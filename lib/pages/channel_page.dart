@@ -61,7 +61,7 @@ class _ChannelPageState extends State<ChannelPage> {
       onPressed: onPlayPausePress,
       tooltip: 'Play/Pause',
       child: curIcon,
-      backgroundColor: Color.fromARGB(220, 59, 61, 126)//Theme.of(context).backgroundColor,
+      backgroundColor: Color.fromARGB(220, 59, 61, 126),//Theme.of(context).backgroundColor,
     );
   }
 
@@ -120,7 +120,7 @@ class _ChannelPageState extends State<ChannelPage> {
         body: Container(
           decoration: BoxDecoration(
             gradient: RadialGradient(
-              radius: 1,
+              radius: 2,
               colors: [Colors.white, Color.fromARGB(255, 183, 187, 210)],
             ),
           ),
@@ -146,7 +146,6 @@ class _ChannelPageState extends State<ChannelPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          
                           curSongAuthor,
                           style: Theme.of(context).textTheme.headline4,
                         ),
@@ -159,6 +158,12 @@ class _ChannelPageState extends State<ChannelPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            CircularShareIconButton(
+                              iconData: FontAwesomeIcons.shareAlt,
+                              color: Colors.green,
+                              link: "Christian Radio Station: http://thevoiceofpilgrim.org/",
+                              isShare: true,
+                            ),
                             CircularShareIconButton(
                               iconData: FontAwesomeIcons.facebookF,
                               color: Color.fromARGB(255, 66, 103, 178),

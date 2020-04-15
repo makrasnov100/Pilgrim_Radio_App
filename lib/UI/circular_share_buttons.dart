@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share/share.dart';
 
 
 class CircularShareIconButton extends StatelessWidget {
@@ -24,7 +25,14 @@ class CircularShareIconButton extends StatelessWidget {
     return Container(
       child: RawMaterialButton(
         onPressed: () {
-          _launchURL();
+          if(isShare)
+          {
+            Share.share(link);
+          }
+          else
+          {
+            _launchURL();
+          }
         },
         child: FaIcon(
           iconData,

@@ -29,7 +29,7 @@ dependencies:
     path: ./external/flutter_radio/
 
   #For metadata
-  xml: ^4.1.0
+  xml: ^3.2.5
   http: ^0.12.0+4
 
   #singleton
@@ -38,6 +38,13 @@ dependencies:
   #share icons
   font_awesome_flutter: ^8.8.1
   url_launcher: ^5.4.2
+  share: ^0.6.3+6
+
+  #contact page
+  grouped_buttons: ^1.0.4
+
+  #launcher_icon
+  flutter_launcher_icons: ^0.7.4
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -48,6 +55,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+flutter_icons:
+  android: "launcher_icon" 
+  ios: true
+  image_path: "assets/icon/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -65,6 +76,7 @@ flutter:
     - assets/logo.png
   #   - assets/icons/ukraine.png
   #   - assets/icons/unitedStates.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
