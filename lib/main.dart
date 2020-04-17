@@ -1,9 +1,13 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'services/locator.dart';
 
 import 'pages/channel_page.dart';
 import 'pages/contact_page.dart';
+
+import 'package:voice_of_pilgrim/services/bg_audio_task.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -45,7 +49,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: customColor,//Color.fromRGBO(50, 61, 126, 1.0),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'The Voice of Pilgrim'),
+      home: AudioServiceWidget(
+        child: MyHomePage(
+          title: 'The Voice of Pilgrim'
+        )
+      ),
     );
   }
 }
@@ -66,6 +74,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
+  }
+
+  @override
+  void dispose() {
+    // TODO: should audio service be stopped here?
+    super.dispose();
   }
 
   void onTabTapped(int index) async
@@ -91,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ChannelPage(
                 streamURL: "http://37.187.112.164:8000/stream", 
                 statsURL: "http://37.187.112.164:8000/stats",
+                streamId: 0,
               ),
             ),
             Visibility(
@@ -98,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ChannelPage(
                 streamURL: "http://ca.rcast.net:8010/stream", 
                 statsURL: "http://ca.rcast.net:8010/stats",
+                streamId: 1,
               )
             ),
             Visibility(

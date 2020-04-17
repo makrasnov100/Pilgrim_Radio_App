@@ -33,7 +33,7 @@ class RadioControlService
     return true;
   }
 
-  void changeChannels(String streamURL, String statsURL)
+  Future<void> changeChannels(String streamURL, String statsURL) async
   {
     if(!isInitialized)
       if(!initializeService())
@@ -44,8 +44,8 @@ class RadioControlService
 
     if(isPlaying)
     {
-      pausePlaying();
-      beginPlaying();
+      await pausePlaying();
+      await beginPlaying();
     }
   }
 

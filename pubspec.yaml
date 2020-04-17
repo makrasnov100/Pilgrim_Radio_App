@@ -32,6 +32,9 @@ dependencies:
   xml: ^3.2.5
   http: ^0.12.0+4
 
+  #audio control
+  audio_service: ^0.7.2
+
   #singleton
   get_it: ^4.0.1
 
