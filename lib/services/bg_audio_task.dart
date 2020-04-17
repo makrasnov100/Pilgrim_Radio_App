@@ -70,6 +70,7 @@ class BGAudioTask extends BackgroundAudioTask {
       curSongTitle = "";
 
     curSong = MediaItem(id: "NA", album: "None", title: curSongTitle, artist: curSongAuthor);
+    AudioServiceBackground.setMediaItem(curSong);
   }
 
   @override
@@ -80,6 +81,11 @@ class BGAudioTask extends BackgroundAudioTask {
     statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
       updateSongInfo();
     });
+
+    AudioServiceBackground.setState(        
+      controls: [playControl, stopControl],
+      basicState: BasicPlaybackState.paused,
+    );
 
     await _streamComplete();
   }
