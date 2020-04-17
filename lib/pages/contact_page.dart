@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
+import 'package:http/http.dart';
 
 class ContactPage extends StatefulWidget {
   ContactPage({Key key}) : super(key: key);
@@ -12,6 +14,7 @@ class _ContactPageState extends State<ContactPage> {
 
   final _formKey = GlobalKey<FormState>();
   String selectedFavorite = "";
+  int selectedFavoriteNum = -1;
 
   //input field controllers
   ScrollController _pageScrollControl = ScrollController();
@@ -21,7 +24,28 @@ class _ContactPageState extends State<ContactPage> {
   TextEditingController nameInputController = TextEditingController();
   TextEditingController ageInputController = TextEditingController();
 
-  sendFeedback()
+  String getFavoriteEntry(int index)
+  {
+    String result = "&entry.1591633300=";
+    if(index == 0)
+      result += "%D0%9F%D0%B5%D1%81%D0%BD%D0%B8";
+    else if(index == 1)
+      result += "%D0%A1%D1%82%D0%B8%D1%85%D0%B8";
+    else if(index == 2)
+      result += "%D0%9F%D1%80%D0%BE%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%B8";
+    else if(index == 3)
+      result += "%D0%9C%D0%B8%D0%BD%D0%B8+%D0%BF%D1%80%D0%BE%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%B8";
+    else if(index == 4)
+      result += "%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87%D0%B8+%D1%81+%D1%83%D1%87%D0%B0%D1%81%D1%82%D0%B8%D0%B5%D0%BC+%D0%B2%D0%B5%D0%B4%D1%83%D1%89%D0%B8%D1%85";
+    else if(index == 5)
+      result += "%D0%91%D0%B5%D1%81%D0%B5%D0%B4%D1%8B+%D1%81%D0%BE+%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D1%82%D0%B5%D0%BB%D1%8F%D0%BC%D0%B8+%D0%B8+%D0%BF%D0%B0%D1%81%D1%82%D1%8B%D1%80%D1%8F%D0%BC%D0%B8";
+    else
+      return "";
+    
+    return result;
+  }
+
+  void sendFeedback() async
   {
     //Perform content checks
     String error = "";
@@ -42,7 +66,31 @@ class _ContactPageState extends State<ContactPage> {
     else
     {
       //Send out the form content to google form
-      
+      String feedbackText = feedbackInputController.text;
+      String top40Text = top40InputController.text;
+      String suggestionText = suggestionInputController.text;
+      String nameText = nameInputController.text;
+      String ageText = ageInputController.text;
+
+      //Create the POST HTTP request
+      String postURL = "https://docs.google.com/forms/d/e/1FAIpQLSdn2zfUa9v54Q2fX7FSozBKQL7JG8C51V5mrctP00ITicr-ug/formResponse?";
+      // - top 40 responce
+      postURL += "entry.2082284472=" + top40Text;
+      // - favorite tracks
+      postURL += getFavoriteEntry(selectedFavoriteNum);
+      // - feedback
+      postURL += "&entry.326955045=" + feedbackText;
+      // - suggestion
+      postURL += "&entry.1696159737=" + suggestionText;
+      // - name
+      postURL += "&entry.485428648=" + nameText;
+      // - age
+      postURL += "&entry.879531967=" + ageText;
+
+      //Submit Request
+      Response responce = await post(postURL);
+      print("Form Responce Status Code: " + responce.statusCode.toString());
+      print("Form Responce Body: " + responce.body.toString());
 
       //Reset fields
       setState(() {
@@ -65,6 +113,10 @@ class _ContactPageState extends State<ContactPage> {
     setState(() {
       selectedFavorite = newValue;
     });
+  }
+  void onChangeRadioSelectionNum(String label, int index)
+  {
+    selectedFavoriteNum = index;
   }
 
   @override
@@ -129,6 +181,7 @@ class _ContactPageState extends State<ContactPage> {
                       style: TextStyle(fontWeight: FontWeight.w700)
                     ),
                     RadioButtonGroup(
+                      onChange: onChangeRadioSelectionNum,
                       picked: selectedFavorite,
                       labels: <String>[
                         "Песни",
@@ -186,6 +239,7 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                     SizedBox(height:5),
                     TextFormField(
+                      controller: ageInputController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white60,
