@@ -119,7 +119,7 @@ class RadioControlService
       List<String> result = List<String>(); 
       if(splitIdx == -1)
       {
-        result.add("Radio Team");
+        result.add("Radio Stream");
         result.add(songInfo);
       }
       else
@@ -132,7 +132,7 @@ class RadioControlService
     catch (e)
     {
       print("ERROR retrieving song stats - " + e.toString());
-      return ["Radio Team", "Radio Stream Unavaliable"];
+      return ["Radio Stream", "Unavaliable"];
     }
   }
 }

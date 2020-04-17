@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'services/locator.dart';
 
 import 'pages/channel_page.dart';
@@ -110,16 +111,16 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.language),
-              title: new Text('Главный'),
+              icon: Icon(Icons.radio),
+              title: new Text("Main Radio"),
             ),
             BottomNavigationBarItem(
-              icon: new Icon(Icons.flare),
-              title: new Text('Молодежный'),
+              icon: new Icon(FontAwesomeIcons.broadcastTower),
+              title: new Text("Youth Radio"),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.contact_mail),
-              title: Text('Дать Отзыв')
+              icon: Icon(Icons.feedback),
+              title: Text("Contact Us")
             )
           ],
         ),

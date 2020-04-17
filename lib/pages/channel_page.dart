@@ -35,12 +35,12 @@ class _ChannelPageState extends State<ChannelPage> {
   Timer timer;
   bool isStreaming = false;
   bool isCanChangePlayState = true;
-  String curSongAuthor = "Radio Team";
+  String curSongAuthor = "Radio Stream";
   String curSongTitle = "Loading...";
 
   void onPlayPausePress() async
   {
-    if(curSongTitle != "Radio Stream Unavaliable" && curSongTitle != "Loading..." && isCanChangePlayState)
+    if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && isCanChangePlayState)
     {
       isCanChangePlayState = false;
       await getIt<RadioControlService>().onPlayPausePress();
@@ -49,7 +49,7 @@ class _ChannelPageState extends State<ChannelPage> {
     }
   }
 
-  FloatingActionButton getFloatButton()
+  Widget getFloatButton()
   {
     Icon curIcon = Icon(Icons.play_arrow);
     if(getIt<RadioControlService>().isPlaying)
@@ -57,11 +57,23 @@ class _ChannelPageState extends State<ChannelPage> {
       curIcon = Icon(Icons.pause);
     }
 
-    return FloatingActionButton(
-      onPressed: onPlayPausePress,
-      tooltip: 'Play/Pause',
-      child: curIcon,
-      backgroundColor: Color.fromARGB(220, 59, 61, 126),//Theme.of(context).backgroundColor,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          height: 80,
+          width: 80,
+          child: FittedBox(
+            child: FloatingActionButton(
+              onPressed: onPlayPausePress,
+              tooltip: 'Play/Pause',
+              child: curIcon,
+              backgroundColor: Color.fromARGB(220, 59, 61, 126),//Theme.of(context).backgroundColor,
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
+      ],
     );
   }
 
@@ -85,7 +97,7 @@ class _ChannelPageState extends State<ChannelPage> {
     else
       curSongTitle = "";
 
-    if(curSongTitle == "Radio Stream Unavaliable")
+    if(curSongTitle == "Unavaliable")
       isStreaming = false;
     else
       isStreaming = true;
@@ -117,6 +129,7 @@ class _ChannelPageState extends State<ChannelPage> {
           visible: isStreaming,
           child: getFloatButton(),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: Container(
           decoration: BoxDecoration(
             gradient: RadialGradient(
@@ -173,7 +186,7 @@ class _ChannelPageState extends State<ChannelPage> {
                             CircularShareIconButton(
                               iconData: FontAwesomeIcons.youtube,
                               color: Color.fromARGB(255, 255, 0, 0),
-                              link: "https://www.youtube.com/channel/UCv-wXL-nx_ahH3kOR4jM7vQ",
+                              link: "https://www.youtube.com/playlist?list=PLyY7Cd7wQj3QmUB2Y3X8rlNGfi39hjQkE&fbclid=IwAR1uIlhaFRubaxt72JiB3dgW_wNdrRuqa4NPUAXI4FeBYMRfTNY__MDr5UM",
                               isShare: false,
                             ),
                             CircularShareIconButton(
