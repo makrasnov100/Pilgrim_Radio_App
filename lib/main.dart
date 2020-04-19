@@ -68,11 +68,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   //Tab Pages
   int _currentIndex = 0;
+  int latestRadioChannel = -1;
 
   void setUpMedia() async
   {
     await AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
     AudioService.seekTo(_currentIndex);
+    latestRadioChannel = _currentIndex;
   }
 
   @override
@@ -89,8 +91,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onTabTapped(int index) async
   {
+    //prevents sound pause when pressing on the currently open tab
+    if(_currentIndex == index)
+      return;
+
     if(index == 0 || index == 1)
-      AudioService.seekTo(index);
+    {
+      //prevents pause when going from feedback to playing radio
+      if(latestRadioChannel != index)
+      {
+        AudioService.seekTo(index);
+      }
+      latestRadioChannel = index;
+    }
     setState(() {_currentIndex = index;});
   }
 

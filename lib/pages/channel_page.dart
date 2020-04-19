@@ -47,7 +47,7 @@ class _ChannelPageState extends State<ChannelPage> {
     if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && isCanChangePlayState)
     {
       isCanChangePlayState = false;
-
+    
       AudioService.play();
       Future.delayed(const Duration(seconds: 1), () 
       {
