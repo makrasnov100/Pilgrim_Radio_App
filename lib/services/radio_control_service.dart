@@ -100,6 +100,11 @@ class RadioControlService
     }
   }
 
+  Future<void> stopRadio()
+  {
+    FlutterRadio.stop();
+  }
+
   Future<String> readResponse(HttpClientResponse response) {
     var completer = new Completer<String>();
     var contents = new StringBuffer();

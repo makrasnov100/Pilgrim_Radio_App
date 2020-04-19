@@ -7,13 +7,16 @@ import 'package:voice_of_pilgrim/UI/circular_share_buttons.dart';
 
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:voice_of_pilgrim/services/bg_audio_task.dart';
+
 
 
 class ChannelPage extends StatefulWidget {
   MediaItem mediaSnapshot;
   PlaybackState stateSnapshot;
+  int channelID;
 
-  ChannelPage({Key key, this.mediaSnapshot, this.stateSnapshot}) : super(key: key);
+  ChannelPage({Key key, this.mediaSnapshot, this.stateSnapshot, this.channelID}) : super(key: key);
 
   var state = _ChannelPageState();
 
@@ -30,11 +33,15 @@ class _ChannelPageState extends State<ChannelPage> {
   String curSongAuthor = "Radio Stream";
   String curSongTitle = "Loading...";
 
-  bool isStreaming(MediaItem curMedia)
+  bool isStreaming({MediaItem curMedia, PlaybackState curState})
   {
     curSongAuthor = curMedia.artist;
     curSongTitle = curMedia.title;
-    if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && widget.stateSnapshot.basicState != BasicPlaybackState.none)
+    if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && (curState != null && curState.basicState != BasicPlaybackState.none))
+    {
+      return true;
+    }
+    if(curState != null && curState.basicState == BasicPlaybackState.stopped)
     {
       return true;
     }
@@ -47,12 +54,24 @@ class _ChannelPageState extends State<ChannelPage> {
     if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && isCanChangePlayState)
     {
       isCanChangePlayState = false;
-    
-      AudioService.play();
-      Future.delayed(const Duration(seconds: 1), () 
+
+      if (widget.stateSnapshot == null)
       {
-        isCanChangePlayState = true;
-      });
+        await AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
+        AudioService.seekTo(widget.channelID);
+        Future.delayed(const Duration(seconds: 1), () 
+        {
+          isCanChangePlayState = true;
+        });
+      } else if (widget.stateSnapshot.basicState == BasicPlaybackState.paused ||
+                 widget.stateSnapshot.basicState == BasicPlaybackState.playing)
+      {
+        AudioService.play();
+        Future.delayed(const Duration(seconds: 1), () 
+        {
+          isCanChangePlayState = true;
+        });
+      }
     }
   }
 
@@ -62,6 +81,10 @@ class _ChannelPageState extends State<ChannelPage> {
     if(curState.basicState == BasicPlaybackState.playing)
     {
       curIcon = Icon(Icons.pause);
+    }
+    if(curState.basicState == BasicPlaybackState.stopped)
+    {
+      curIcon = Icon(Icons.sync);
     }
 
     return Column(
@@ -99,8 +122,11 @@ class _ChannelPageState extends State<ChannelPage> {
     return Expanded(
       child: Scaffold(
       floatingActionButton: Visibility(
-        visible: isStreaming(widget.mediaSnapshot??MediaItem(id: "NA", album: "None", title: "Loading...", artist: "Radio Stream")),
-        child: getFloatButton(widget.stateSnapshot??PlaybackState(basicState: BasicPlaybackState.none, actions: null)),
+        visible: isStreaming(
+          curMedia: widget.mediaSnapshot??MediaItem(id: "NA", album: "None", title: "Stopped", artist: "Radio Stream"),
+          curState: widget.stateSnapshot??PlaybackState(basicState: BasicPlaybackState.stopped, actions: null),
+        ),
+        child: getFloatButton(widget.stateSnapshot??PlaybackState(basicState: BasicPlaybackState.stopped, actions: null)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
@@ -137,7 +163,7 @@ class _ChannelPageState extends State<ChannelPage> {
                       ),
                       SizedBox(height: 5,),
                       Text(
-                        (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Loading...", artist:"")).title,
+                        (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Stopped", artist:"")).title,
                         style: Theme.of(context).textTheme.headline6
                       ),
                       SizedBox(height: 40,),

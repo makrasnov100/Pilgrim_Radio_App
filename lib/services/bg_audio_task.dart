@@ -10,17 +10,17 @@ void myBackgroundAudioTaskEntrypoint() {
 }
 
 MediaControl playControl = MediaControl(
-  androidIcon: 'drawable/ic_action_play_arrow',
+  androidIcon: 'drawable/ic_stat_play_arrow',
   label: 'Play',
   action: MediaAction.play,
 );
 MediaControl pauseControl = MediaControl(
-  androidIcon: 'drawable/ic_action_pause',
+  androidIcon: 'drawable/ic_stat_pause',
   label: 'Pause',
   action: MediaAction.pause,
 );
 MediaControl stopControl = MediaControl(
-  androidIcon: 'drawable/ic_action_stop',
+  androidIcon: 'drawable/ic_stat_stop',
   label: 'Stop',
   action: MediaAction.stop,
 );
@@ -84,36 +84,38 @@ class BGAudioTask extends BackgroundAudioTask {
   @override
   Future<void> onStart() async {
 
-    //Begin the constantly updating stream
-    statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
-      updateSongInfo();
-    });
+      //Begin the constantly updating stream
+      statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
+        updateSongInfo();
+      });
 
-    AudioServiceBackground.setState(        
-      controls: [playControl, stopControl],
-      basicState: BasicPlaybackState.paused,
-    );
+      AudioServiceBackground.setState(        
+        controls: [playControl],
+        basicState: BasicPlaybackState.paused,
+      );
 
-    await _streamComplete();
+      await _streamComplete();    //Begin the constantly updating stream
   }
+
   @override
   void onStop() {
+
     if (_basicState == BasicPlaybackState.stopped) 
       return;
 
     if(statsUpdater != null)
       statsUpdater.cancel();
 
-    //TODO: perform dispose of radio?
-
     AudioServiceBackground.setState(
       controls: [],
       basicState: BasicPlaybackState.stopped,
     );
+    radioControlService.stopRadio();
     _stopStreamCompleter.complete();
   }
   @override
   void onPlay() {
+
     playPause();
   }
   @override
@@ -156,7 +158,7 @@ class BGAudioTask extends BackgroundAudioTask {
     {
       //Perform pausing operation
       await AudioServiceBackground.setState(
-        controls: [playControl, stopControl],
+        controls: [playControl],
         basicState: BasicPlaybackState.paused,
       );
     }

@@ -128,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       Visibility(
                         visible: _currentIndex == 0 || _currentIndex == 1,
-                        child: ChannelPage(mediaSnapshot:mediaSnapshot.data, stateSnapshot:stateSnapshot.data),
+                        child: ChannelPage(mediaSnapshot:mediaSnapshot.data, stateSnapshot:stateSnapshot.data, channelID:_currentIndex),
                       ),
                       Visibility(
                         visible: _currentIndex == 2,
