@@ -27,12 +27,15 @@ MediaControl stopControl = MediaControl(
 
 class BGAudioTask extends BackgroundAudioTask {
 
-  RadioControlService radioControlService;
 
   //TODO: figure out how to not make this hard coded
   //Stream info
   List<String> streamURLs = ["http://37.187.112.164:8000/stream", "http://ca.rcast.net:8010/stream"];
   List<String> statsURLs = ["http://37.187.112.164:8000/stats", "http://ca.rcast.net:8010/stats"];
+
+  RadioControlService radioControlService = RadioControlService();
+  String prevTitle = "";
+  String prevAuthor = "";
 
   MediaItem curSong = MediaItem(id: "None", album: "NA", title: "Radio Stream", artist: "Loading...");
 
@@ -69,13 +72,17 @@ class BGAudioTask extends BackgroundAudioTask {
     else
       curSongTitle = "";
 
-    curSong = MediaItem(id: "NA", album: "None", title: curSongTitle, artist: curSongAuthor);
-    AudioServiceBackground.setMediaItem(curSong);
+    if(prevAuthor != curSongAuthor || prevTitle != curSongTitle)
+    {
+      prevAuthor = curSongAuthor;
+      prevTitle = curSongTitle;
+      curSong = MediaItem(id: "NA", album: "None", title: curSongTitle, artist: curSongAuthor);
+      AudioServiceBackground.setMediaItem(curSong);
+    }
   }
 
   @override
   Future<void> onStart() async {
-    radioControlService = RadioControlService(streamURL: streamURLs[0], statsURL: statsURLs[0]);
 
     //Begin the constantly updating stream
     statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
@@ -122,7 +129,7 @@ class BGAudioTask extends BackgroundAudioTask {
   @override
   void onSeekTo(int pos) async
   {
-    if(pos > 0 && pos < streamURLs.length && radioControlService != null)
+    if(pos >= 0 && pos < streamURLs.length && radioControlService != null)
     {
       await radioControlService.changeChannels(streamURLs[pos], statsURLs[pos]);
     }
@@ -130,7 +137,7 @@ class BGAudioTask extends BackgroundAudioTask {
     updateSongInfo();
   }
 
-  void playPause() async
+  Future<void> playPause() async
   {
     if(radioControlService == null)
       return;
@@ -139,18 +146,18 @@ class BGAudioTask extends BackgroundAudioTask {
 
     if (radioControlService.isPlaying)
     {
-      //Perform pausing operation
-      AudioServiceBackground.setState(
-        controls: [playControl, stopControl],
-        basicState: BasicPlaybackState.paused,
+      //Perform playing operation
+      await AudioServiceBackground.setState(
+        controls: [pauseControl, stopControl],
+        basicState: BasicPlaybackState.playing,
       );
     }
     else
     {
-      //Perform playing operation
-      AudioServiceBackground.setState(
-        controls: [pauseControl, stopControl],
-        basicState: BasicPlaybackState.playing,
+      //Perform pausing operation
+      await AudioServiceBackground.setState(
+        controls: [playControl, stopControl],
+        basicState: BasicPlaybackState.paused,
       );
     }
   }

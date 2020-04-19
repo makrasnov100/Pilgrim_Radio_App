@@ -1,5 +1,7 @@
 import 'package:flutter_radio/flutter_radio.dart';
-import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'dart:convert';
+import 'dart:async';
 import 'package:xml/xml.dart' as xml;
 
 
@@ -16,10 +18,10 @@ class RadioControlService
   }
 
   //TRUE - successfully initialized, FALSE - failed
-  bool initializeService()
+  Future<bool> initializeService() async
   {
     try{
-      FlutterRadio.audioStart();
+      await FlutterRadio.audioStart();
       isInitialized = true;
     } catch (e) {
       print("ERROR initializing radio sevice - " + e.toString());
@@ -36,7 +38,7 @@ class RadioControlService
   Future<void> changeChannels(String streamURL, String statsURL) async
   {
     if(!isInitialized)
-      if(!initializeService())
+      if(!await initializeService())
         return;
 
     this.streamURL = streamURL;
@@ -59,7 +61,7 @@ class RadioControlService
 
   Future<void> beginPlaying() async
   {
-    if(isPlaying || await FlutterRadio.isPlaying())
+    if(await FlutterRadio.isPlaying())
     {
       isPlaying = true;
       return;
@@ -67,36 +69,44 @@ class RadioControlService
 
     try {
       if(!isInitialized)
-        if(!initializeService())
+        if(!await initializeService())
           throw Exception("Cant initialize radio service!");
 
-      FlutterRadio.play(url: streamURL);
+      await FlutterRadio.play(url: streamURL);
       isPlaying = true;
     } catch (e) {
-      isPlaying = false;
+      isPlaying = await FlutterRadio.isPlaying();
       print("ERROR starting stream - " + e.toString());
     }
   }
 
   Future<void> pausePlaying() async
   {
-    if(!isPlaying || !(await FlutterRadio.isPlaying()))
+    if(!(await FlutterRadio.isPlaying()))
     {
-      
       isPlaying = false;
       return;
     }
 
     try{
       if(!isInitialized)
-        if(!initializeService())
+        if(!await initializeService())
           throw Exception("Cant initialize radio service!");
-      FlutterRadio.pause(url: streamURL);
+      await FlutterRadio.pause(url: streamURL);
       isPlaying = false;
     } catch (e) {
-      isPlaying = true;
+      isPlaying = await FlutterRadio.isPlaying();
       print("ERROR pausing stream - " + e.toString());
     }
+  }
+
+  Future<String> readResponse(HttpClientResponse response) {
+    var completer = new Completer<String>();
+    var contents = new StringBuffer();
+    response.transform(utf8.decoder).listen((data) {
+      contents.write(data);
+    }, onDone: () => completer.complete(contents.toString()));
+    return completer.future;
   }
 
 
@@ -106,8 +116,11 @@ class RadioControlService
     try
     {
       //Retrieving info
-      final response = await http.get(statsURL);
-      final responceDoc = xml.parse(response.body);
+      final client = new HttpClient();
+      final request = await client.getUrl(Uri.parse(statsURL));
+      HttpClientResponse response = await request.close();
+      String responceText = await readResponse(response);
+      final responceDoc = xml.parse(responceText);
       String songInfo = responceDoc.findAllElements("SONGTITLE").single.text;
 
       if(songInfo == "")

@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   }
 
   
-  Map<int, Color> colorCodes = {
+  final Map<int, Color> colorCodes = {
     50: Color.fromRGBO(59, 61, 126, .1),
     100: Color.fromRGBO(59, 61, 126, .2),
     200: Color.fromRGBO(59, 61, 126, .3),
@@ -33,8 +33,6 @@ class MyApp extends StatelessWidget {
     800: Color.fromRGBO(59, 61, 126, .9),
     900: Color.fromRGBO(59, 61, 126, 1),
   };
-
-
 
   // This widget is the root of your application.
   @override
@@ -71,77 +69,83 @@ class _MyHomePageState extends State<MyHomePage> {
   //Tab Pages
   int _currentIndex = 0;
 
+  void setUpMedia() async
+  {
+    await AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
+    AudioService.seekTo(_currentIndex);
+  }
+
   @override
   void initState() {
+    setUpMedia();
     super.initState();
-    AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
   }
 
   @override
   void dispose() {
-    // TODO: should audio service be stopped here?
+    AudioService.stop();
     super.dispose();
   }
 
   void onTabTapped(int index) async
   {
+    if(index == 0 || index == 1)
+      AudioService.seekTo(index);
     setState(() {_currentIndex = index;});
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Center(
-            child: Text(widget.title,
-              textAlign: TextAlign.center,
-              ),
-          ),
-        ),
-        body: Column(
-          children: [
-            Visibility(
-              visible: _currentIndex == 0,
-              child: ChannelPage(
-                streamURL: "http://37.187.112.164:8000/stream", 
-                statsURL: "http://37.187.112.164:8000/stats",
-                streamId: 0,
-              ),
-            ),
-            Visibility(
-              visible: _currentIndex == 1,
-              child: ChannelPage(
-                streamURL: "http://ca.rcast.net:8010/stream", 
-                statsURL: "http://ca.rcast.net:8010/stats",
-                streamId: 1,
-              )
-            ),
-            Visibility(
-              visible: _currentIndex == 2,
-              child: ContactPage(),
-            ),
-          ],
-        ), 
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: onTabTapped,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.radio),
-              title: new Text("Main Radio"),
-            ),
-            BottomNavigationBarItem(
-              icon: new Icon(FontAwesomeIcons.broadcastTower),
-              title: new Text("Youth Radio"),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.feedback),
-              title: Text("Contact Us")
-            )
-          ],
-        ),
-      ),
+    return StreamBuilder<MediaItem>(
+        stream: AudioService.currentMediaItemStream,
+        builder: (context, mediaSnapshot) {
+          return StreamBuilder<PlaybackState>(
+            stream: AudioService.playbackStateStream,
+            builder: (context, stateSnapshot) {
+              return SafeArea(
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Center(
+                      child: Text(widget.title,
+                        textAlign: TextAlign.center,
+                        ),
+                    ),
+                  ),
+                  body: Column(
+                    children: [
+                      Visibility(
+                        visible: _currentIndex == 0 || _currentIndex == 1,
+                        child: ChannelPage(mediaSnapshot:mediaSnapshot.data, stateSnapshot:stateSnapshot.data),
+                      ),
+                      Visibility(
+                        visible: _currentIndex == 2,
+                        child: ContactPage(),
+                      ),
+                    ],
+                  ), 
+                  bottomNavigationBar: BottomNavigationBar(
+                    currentIndex: _currentIndex,
+                    onTap: onTabTapped,
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.radio),
+                        title: new Text("Main Radio"),
+                      ),
+                      BottomNavigationBarItem(
+                        icon: new Icon(FontAwesomeIcons.broadcastTower),
+                        title: new Text("Youth Radio"),
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.feedback),
+                        title: Text("Contact Us")
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        }
     );
   }
 }
