@@ -7,6 +7,7 @@ import 'package:voice_of_pilgrim/UI/circular_share_buttons.dart';
 
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:voice_of_pilgrim/services/SizeConfig.dart';
 import 'package:voice_of_pilgrim/services/bg_audio_task.dart';
 
 
@@ -102,7 +103,6 @@ class _ChannelPageState extends State<ChannelPage> {
             ),
           ),
         ),
-        SizedBox(height: 10),
       ],
     );
   }
@@ -119,6 +119,7 @@ class _ChannelPageState extends State<ChannelPage> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig().init(context); //ui scaling object
     return Expanded(
       child: Scaffold(
       floatingActionButton: Visibility(
@@ -136,72 +137,78 @@ class _ChannelPageState extends State<ChannelPage> {
             colors: [Colors.white, Color.fromARGB(255, 183, 187, 210)],
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex:1,
-                child: Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    height: 200,
-                    child: Image.asset("assets/logo.png"),
-                  ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Flexible(
+              flex: 1,
+              child: Container(),
+            ),
+            Flexible(
+              flex:5,
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  height: SizeConfig.safeBlockVertical * 27,
+                  child: Image.asset("assets/logo.png"),
                 ),
               ),
-              Flexible(
-                flex:1,
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "", artist:"Radio Stream")).artist,
-                        style: Theme.of(context).textTheme.headline4,
-                      ),
-                      SizedBox(height: 5,),
-                      Text(
-                        (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Stopped", artist:"")).title,
-                        style: Theme.of(context).textTheme.headline6
-                      ),
-                      SizedBox(height: 40,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularShareIconButton(
-                            iconData: FontAwesomeIcons.shareAlt,
-                            color: Colors.green,
-                            link: "Christian Radio Station: http://thevoiceofpilgrim.org/",
-                            isShare: true,
-                          ),
-                          CircularShareIconButton(
-                            iconData: FontAwesomeIcons.facebookF,
-                            color: Color.fromARGB(255, 66, 103, 178),
-                            link: "https://www.facebook.com/golos.piligrima/",
-                            isShare: false,
-                          ),
-                          CircularShareIconButton(
-                            iconData: FontAwesomeIcons.youtube,
-                            color: Color.fromARGB(255, 255, 0, 0),
-                            link: "https://www.youtube.com/playlist?list=PLyY7Cd7wQj3QmUB2Y3X8rlNGfi39hjQkE&fbclid=IwAR1uIlhaFRubaxt72JiB3dgW_wNdrRuqa4NPUAXI4FeBYMRfTNY__MDr5UM",
-                            isShare: false,
-                          ),
-                          CircularShareIconButton(
-                            iconData: FontAwesomeIcons.odnoklassniki,
-                            color: Color.fromARGB(255, 245, 130, 32),
-                            link: "https://www.ok.ru/group/54576674570348",
-                            isShare: false,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+            ),
+            Flexible(
+              flex:8,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "", artist:"Radio Stream")).artist,
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                    SizedBox(height: 5,),
+                    Text(
+                      (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Stopped", artist:"")).title,
+                      style: Theme.of(context).textTheme.headline6
+                    ),
+                    SizedBox(height: 40,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularShareIconButton(
+                          iconData: FontAwesomeIcons.shareAlt,
+                          color: Colors.green,
+                          link: "Christian Radio Station: http://thevoiceofpilgrim.org/",
+                          isShare: true,
+                        ),
+                        CircularShareIconButton(
+                          iconData: FontAwesomeIcons.facebookF,
+                          color: Color.fromARGB(255, 66, 103, 178),
+                          link: "https://www.facebook.com/golos.piligrima/",
+                          isShare: false,
+                        ),
+                        CircularShareIconButton(
+                          iconData: FontAwesomeIcons.youtube,
+                          color: Color.fromARGB(255, 255, 0, 0),
+                          link: "https://www.youtube.com/playlist?list=PLyY7Cd7wQj3QmUB2Y3X8rlNGfi39hjQkE&fbclid=IwAR1uIlhaFRubaxt72JiB3dgW_wNdrRuqa4NPUAXI4FeBYMRfTNY__MDr5UM",
+                          isShare: false,
+                        ),
+                        CircularShareIconButton(
+                          iconData: FontAwesomeIcons.odnoklassniki,
+                          color: Color.fromARGB(255, 245, 130, 32),
+                          link: "https://www.ok.ru/group/54576674570348",
+                          isShare: false,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Flexible(
+              flex: 3,
+              child: Container(),
+            ),
+          ],
         ),
       ),
     )

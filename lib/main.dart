@@ -1,3 +1,7 @@
+import 'dart:io';
+import 'dart:math';
+import 'package:flutter/services.dart';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -40,6 +44,11 @@ class MyApp extends StatelessWidget {
 
     // Green color code: FF93cd48
     MaterialColor customColor = MaterialColor(0xFF323d7e, colorCodes);
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
     return MaterialApp(
       title: 'Flutter Demo',
@@ -85,7 +94,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    AudioService.stop();
+    try
+    {
+      AudioService.stop();
+    }
+    catch(e)
+    {
+      print("Could not stop player!");
+    }
     super.dispose();
   }
 
@@ -107,6 +123,19 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {_currentIndex = index;});
   }
 
+  void onQuitApp()
+  {
+    try
+    {
+      AudioService.stop();
+    }
+    catch(e)
+    {
+      print("COuld not stop player!");
+    }
+    exit(0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<MediaItem>(
@@ -123,6 +152,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         textAlign: TextAlign.center,
                         ),
                     ),
+                    actions: <Widget>[
+                      // action button
+                      IconButton(
+                        icon: Icon(Icons.power_settings_new),
+                        onPressed:onQuitApp
+                      ),
+                    ],
                   ),
                   body: Column(
                     children: [

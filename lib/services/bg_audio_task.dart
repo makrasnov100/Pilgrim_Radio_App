@@ -158,7 +158,7 @@ class BGAudioTask extends BackgroundAudioTask {
     {
       //Perform pausing operation
       await AudioServiceBackground.setState(
-        controls: [playControl],
+        controls: [playControl,stopControl],
         basicState: BasicPlaybackState.paused,
       );
     }
