@@ -146,12 +146,9 @@ class _ChannelPageState extends State<ChannelPage> {
             ),
             Flexible(
               flex:5,
-              child: Align(
-                alignment: Alignment.center,
-                child: SizedBox(
-                  height: SizeConfig.safeBlockVertical * 27,
-                  child: Image.asset("assets/logo.png"),
-                ),
+              child: SizedBox(
+                height: SizeConfig.safeBlockVertical * 27,
+                child: Image.asset("assets/logo.png"),
               ),
             ),
             Flexible(
@@ -161,16 +158,19 @@ class _ChannelPageState extends State<ChannelPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "", artist:"Radio Stream")).artist,
-                      style: Theme.of(context).textTheme.headline4,
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "", artist:"Radio Stream")).artist,
+                        style: Theme.of(context).textTheme.headline4,
+                      ),
                     ),
                     SizedBox(height: 5,),
                     Text(
                       (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Stopped", artist:"")).title,
                       style: Theme.of(context).textTheme.headline6
                     ),
-                    SizedBox(height: 40,),
+                    SizedBox(height: 20,),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -180,22 +180,32 @@ class _ChannelPageState extends State<ChannelPage> {
                           link: "Christian Radio Station: http://thevoiceofpilgrim.org/",
                           isShare: true,
                         ),
+                        SizedBox(width:10), 
                         CircularShareIconButton(
                           iconData: FontAwesomeIcons.facebookF,
                           color: Color.fromARGB(255, 66, 103, 178),
                           link: "https://www.facebook.com/golos.piligrima/",
                           isShare: false,
                         ),
+                        SizedBox(width:10),
                         CircularShareIconButton(
                           iconData: FontAwesomeIcons.youtube,
                           color: Color.fromARGB(255, 255, 0, 0),
                           link: "https://www.youtube.com/playlist?list=PLyY7Cd7wQj3QmUB2Y3X8rlNGfi39hjQkE&fbclid=IwAR1uIlhaFRubaxt72JiB3dgW_wNdrRuqa4NPUAXI4FeBYMRfTNY__MDr5UM",
                           isShare: false,
                         ),
+                        SizedBox(width:10),
                         CircularShareIconButton(
                           iconData: FontAwesomeIcons.odnoklassniki,
                           color: Color.fromARGB(255, 245, 130, 32),
                           link: "https://www.ok.ru/group/54576674570348",
+                          isShare: false,
+                        ),
+                        SizedBox(width:10),
+                        CircularShareIconButton(
+                          iconData: FontAwesomeIcons.paypal,
+                          color: Color.fromARGB(255, 0, 69, 124),
+                          link: "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=A94QT9EXLTBSL&source=url",
                           isShare: false,
                         ),
                       ],
