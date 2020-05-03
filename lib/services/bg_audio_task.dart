@@ -90,7 +90,7 @@ class BGAudioTask extends BackgroundAudioTask {
       });
 
       AudioServiceBackground.setState(        
-        controls: [playControl],
+        controls: [playControl,stopControl],
         basicState: BasicPlaybackState.paused,
       );
 
