@@ -1,4 +1,4 @@
-package com.example.voice_of_pilgrim
+package com.pilgrim.radio
 
 import io.flutter.embedding.android.FlutterActivity
 
