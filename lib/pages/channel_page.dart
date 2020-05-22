@@ -5,12 +5,12 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:voice_of_pilgrim/UI/circular_share_buttons.dart';
 
-
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:voice_of_pilgrim/services/SizeConfig.dart';
 import 'package:voice_of_pilgrim/services/bg_audio_task.dart';
+import 'package:voice_of_pilgrim/services/like_dislike_service.dart';
 
-
+import 'package:voice_of_pilgrim/services/locator.dart';
 
 class ChannelPage extends StatefulWidget {
   MediaItem mediaSnapshot;
@@ -76,6 +76,27 @@ class _ChannelPageState extends State<ChannelPage> {
     }
   }
 
+  String getChennelType()
+  {
+    // Todo: make a service that consolidates this type of info
+    String channelType = "russian";
+    if(widget.channelID == 1)
+      channelType = "english";
+    return channelType;
+  }
+
+  void onDislikeSong()
+  {
+    String channelType = getChennelType();
+    getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, false);
+  }
+
+  void onLikeSong()
+  {
+    String channelType = getChennelType();
+    getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, true);
+  }
+
   Widget getFloatButton(PlaybackState curState)
   {
     Icon curIcon = Icon(Icons.play_arrow);
@@ -88,20 +109,63 @@ class _ChannelPageState extends State<ChannelPage> {
       curIcon = Icon(Icons.sync);
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
+    return Row(
       children: [
-        Container(
-          height: 80,
-          width: 80,
-          child: FittedBox(
-            child: FloatingActionButton(
-              onPressed: onPlayPausePress,
-              tooltip: 'Play/Pause',
-              child: curIcon,
-              backgroundColor: Color.fromARGB(220, 59, 61, 126),//Theme.of(context).backgroundColor,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Spacer(),
+            SizedBox(
+              width: SizeConfig.screenWidth,
+              child: Row(
+                children: [
+                  Spacer(flex:4),
+                  SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: OutlineButton(
+                      onPressed: onDislikeSong,
+                      borderSide: BorderSide(color: Colors.red, width: 4),
+                      highlightedBorderColor: Colors.pinkAccent,
+                      shape: CircleBorder(),
+                      child: Icon(
+                        Icons.thumb_down, 
+                        size: SizeConfig.safeBlockVertical * 3,
+                        color: Colors.redAccent,),
+                    ),
+                  ),
+                  Spacer(flex:1),
+                  Container(
+                    width: 80,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                        onPressed: onPlayPausePress,
+                        tooltip: 'Play/Pause',
+                        child: curIcon,
+                        backgroundColor: Color.fromARGB(220, 59, 61, 126),//Theme.of(context).backgroundColor,
+                      ),
+                    ),
+                  ),
+                  Spacer(flex:1),
+                  SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: OutlineButton(
+                      onPressed: onLikeSong,
+                      highlightedBorderColor: Colors.greenAccent,
+                      borderSide: BorderSide(color: Colors.green, width: 4),
+                      shape: CircleBorder(),
+                      child: Icon(
+                        Icons.thumb_up, 
+                        size: SizeConfig.safeBlockVertical * 3,
+                        color: Colors.green),
+                    ),
+                  ),
+                  Spacer(flex:4),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ],
     );

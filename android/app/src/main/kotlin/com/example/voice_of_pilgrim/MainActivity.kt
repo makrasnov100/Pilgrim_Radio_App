@@ -1,4 +1,4 @@
-package com.pilgrim.radio
+package com.pilgrim.radio2
 
 import io.flutter.embedding.android.FlutterActivity
 
