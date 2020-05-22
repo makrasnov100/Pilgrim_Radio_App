@@ -131,9 +131,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     catch(e)
     {
-      print("COuld not stop player!");
+      print("Could not stop player!");
     }
-    exit(0);
+    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    //exit(0);  //Above  wqay is apparently better, still doesnt fix black screen remaining
   }
 
   @override
