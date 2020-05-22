@@ -16,7 +16,7 @@ class LikeDislikeService
 {
   LikeDislikeService()
   {
-    loadRatedSongs();
+    // loadRatedSongs();
   }
 
   HashMap<String, SongRating> ratedSongs = HashMap<String, SongRating>();
@@ -92,6 +92,6 @@ class LikeDislikeService
 
   void loadRatedSongs()
   {
-    //TODO: on start of service get all songs that the user has already rtated from divece (since no sign in)
+    //TODO: on start of service get all songs that the user has already rated from divece (since no sign in)
   }
 }
