@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1095868683116",
+    "firebase_url": "https://pilgrimradio-7605c.firebaseio.com",
+    "project_id": "pilgrimradio-7605c",
+    "storage_bucket": "pilgrimradio-7605c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095868683116:android:cb158e057c8ab872efd949",
+        "android_client_info": {
+          "package_name": "com.pilgrim.radio2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1095868683116-h664hbdbirrlvcj5rj26nomols4dm3hn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLhQPLYyIny97RtTfNisF3DpExxOscVR0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1095868683116-h664hbdbirrlvcj5rj26nomols4dm3hn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
