@@ -4,11 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SongRating
 {
-  String song;
-  bool isGood;
+  String songArtist;
+  String songTitle;
   String radioType;
+  bool isGood;
 
-  SongRating(this.song, this.isGood, this.radioType);
+  SongRating(this.songArtist, this.songTitle, this.radioType, this.isGood,);
 }
 
 class LikeDislikeService
@@ -18,17 +19,19 @@ class LikeDislikeService
     loadRatedSongs();
   }
 
-  HashMap<String, bool> ratedSongs = HashMap<String, bool>();
-  final rateSong = FieldValue.increment(1);
+  HashMap<String, SongRating> ratedSongs = HashMap<String, SongRating>();
+  final rateStatUp = FieldValue.increment(1);
+  final rateStatDown = FieldValue.increment(-1);
 
-  void onRateSong(String fullName, bool isGood) async
+
+  Future<void> onRateSong(String fullName, bool isGood) async
   {
     bool needUpdate = true;
     if(ratedSongs.containsKey(fullName))
     {
-      if(ratedSongs[fullName] == isGood)
+      if(ratedSongs[fullName].isGood == isGood)
       {
-        needUpdate = false; //song rating already recorded
+        needUpdate = false; //song rating already
       }
     }
 
@@ -61,17 +64,19 @@ class LikeDislikeService
     if(songDocSnap.documents.length != 0) //Song already present in dictionary
     {
       if(isGood)
-        songDocSnap.documents[0].reference.updateData({'song_likes':rateSong});
+        songDocSnap.documents[0].reference.updateData({'song_likes':rateStatUp, 'song_dislikes':rateStatDown});
       else
-        songDocSnap.documents[0].reference.updateData({'song_dislikes':rateSong});
+        songDocSnap.documents[0].reference.updateData({'song_dislikes':rateStatUp, 'song_likes':rateStatDown});
     }
     else  //Song needs to be create prior to incrementing its
     {
       int songLikes = 0;
       int songDislikes = 1;
       if(isGood)
+      {
         songLikes = 1;
         songDislikes = 0;
+      }
 
       songColRef.add({'radio_type':nameParts[2],
                       'song_artist':nameParts[0],
@@ -79,6 +84,10 @@ class LikeDislikeService
                       'song_likes':songLikes,
                       'song_dislikes':songDislikes});
     }
+
+    ratedSongs[fullName] = SongRating(nameParts[0], nameParts[1], nameParts[2], isGood);
+
+    return;
   }
 
   void loadRatedSongs()

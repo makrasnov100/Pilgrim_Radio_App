@@ -76,7 +76,7 @@ class _ChannelPageState extends State<ChannelPage> {
     }
   }
 
-  String getChennelType()
+  String getChannelType()
   {
     // Todo: make a service that consolidates this type of info
     String channelType = "russian";
@@ -85,28 +85,59 @@ class _ChannelPageState extends State<ChannelPage> {
     return channelType;
   }
 
-  void onDislikeSong()
+  void onDislikeSong() async
   {
-    String channelType = getChennelType();
-    getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, false);
+    String channelType = getChannelType();
+    await getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, false);
+    setState(() {});
   }
 
-  void onLikeSong()
+  void onLikeSong() async
   {
-    String channelType = getChennelType();
-    getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, true);
+    String channelType = getChannelType();
+    await getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, true);
+    setState(() {});
   }
 
   Widget getFloatButton(PlaybackState curState)
   {
+    //Find correct Play and Rate button apearence
     Icon curIcon = Icon(Icons.play_arrow);
+
+
     if(curState.basicState == BasicPlaybackState.playing)
     {
+      //play
       curIcon = Icon(Icons.pause);
     }
     if(curState.basicState == BasicPlaybackState.stopped)
     {
+      //play
       curIcon = Icon(Icons.sync);
+    }
+
+    //Check if an option was already selected
+    String songFullName = curSongAuthor+"|"+curSongTitle+"|"+getChannelType();
+    Color rateDownOutline = Colors.redAccent;
+    Color rateUpOutline = Colors.green;
+    Color rateDownInside = Colors.transparent;
+    Color rateUpInside = Colors.transparent;
+    Color rateUpIcon = Colors.green;
+    Color rateDownIcon = Colors.redAccent;
+    if(getIt<LikeDislikeService>().ratedSongs.containsKey(songFullName))
+    {
+      if(getIt<LikeDislikeService>().ratedSongs[songFullName].isGood)  //song already rated as good
+      {
+        rateUpOutline = Colors.black;
+        rateUpIcon = Colors.white;
+        rateUpInside = Colors.green;
+      }
+      else //song already rated as bad
+      {
+        rateDownOutline = Colors.black;
+        rateDownIcon = Colors.white;
+        rateDownInside = Colors.redAccent;
+      }
     }
 
     return Row(
@@ -120,18 +151,22 @@ class _ChannelPageState extends State<ChannelPage> {
               child: Row(
                 children: [
                   Spacer(flex:4),
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: OutlineButton(
-                      onPressed: onDislikeSong,
-                      borderSide: BorderSide(color: Colors.red, width: 4),
-                      highlightedBorderColor: Colors.pinkAccent,
-                      shape: CircleBorder(),
-                      child: Icon(
-                        Icons.thumb_down, 
-                        size: SizeConfig.safeBlockVertical * 3,
-                        color: Colors.redAccent,),
+                  Visibility(
+                    visible: curState.basicState == BasicPlaybackState.playing,
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: FlatButton(
+                        onPressed: onDislikeSong,
+                        color: rateDownInside,
+                        shape: CircleBorder(
+                          side: BorderSide(color: rateDownOutline, width: 4),
+                        ),
+                        child: Icon(
+                          Icons.thumb_down, 
+                          size: SizeConfig.safeBlockVertical * 3,
+                          color: rateDownIcon,),
+                      ),
                     ),
                   ),
                   Spacer(flex:1),
@@ -147,18 +182,22 @@ class _ChannelPageState extends State<ChannelPage> {
                     ),
                   ),
                   Spacer(flex:1),
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: OutlineButton(
-                      onPressed: onLikeSong,
-                      highlightedBorderColor: Colors.greenAccent,
-                      borderSide: BorderSide(color: Colors.green, width: 4),
-                      shape: CircleBorder(),
-                      child: Icon(
-                        Icons.thumb_up, 
-                        size: SizeConfig.safeBlockVertical * 3,
-                        color: Colors.green),
+                  Visibility(
+                    visible: curState.basicState == BasicPlaybackState.playing,
+                    child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: FlatButton(
+                        onPressed: onLikeSong,
+                        color: rateUpInside,
+                        shape: CircleBorder(
+                          side: BorderSide(color: rateUpOutline, width: 4),
+                        ),
+                        child: Icon(
+                          Icons.thumb_up, 
+                          size: SizeConfig.safeBlockVertical * 3,
+                          color: rateUpIcon),
+                      ),
                     ),
                   ),
                   Spacer(flex:4),

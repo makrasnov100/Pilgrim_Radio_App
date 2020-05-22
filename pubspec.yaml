@@ -33,15 +33,15 @@ dependencies:
   http: ^0.12.0+4
 
   #audio control
-  audio_service: ^0.7.2
+  audio_service: ^0.8.0
 
   #singleton
-  get_it: ^4.0.1
+  get_it: ^4.0.2
 
   #share icons
   font_awesome_flutter: ^8.8.1
   url_launcher: ^5.4.2
-  share: ^0.6.3+6
+  share: ^0.6.4+3
 
   #contact page
   grouped_buttons: ^1.0.4
