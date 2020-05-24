@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
     ]);
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Pilgrim Radio',
       theme: ThemeData(
         primarySwatch: customColor,//Color.fromRGBO(50, 61, 126, 1.0),
         visualDensity: VisualDensity.adaptivePlatformDensity,
