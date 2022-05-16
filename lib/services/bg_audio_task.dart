@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:voice_of_pilgrim/services/radio_control_service.dart';
 
+enum StatsType { xml, json }
+
 void myBackgroundAudioTaskEntrypoint() {
   AudioServiceBackground.run(() => BGAudioTask());
 }
@@ -26,12 +28,11 @@ MediaControl stopControl = MediaControl(
 );
 
 class BGAudioTask extends BackgroundAudioTask {
-
-
   //TODO: figure out how to not make this hard coded
   //Stream info
   List<String> streamURLs = ["http://37.187.112.164:8000/stream", "http://ca.rcast.net:8010/stream"];
-  List<String> statsURLs = ["http://37.187.112.164:8000/stats", "http://ca.rcast.net:8010/stats"];
+  List<String> statsURLs = ["http://37.187.112.164:8000/status-json.xsl", "http://ca.rcast.net:8010/stats"];
+  List<StatsType> statsTypes = [StatsType.json, StatsType.xml];
 
   RadioControlService radioControlService = RadioControlService();
   String prevTitle = "";
@@ -46,34 +47,29 @@ class BGAudioTask extends BackgroundAudioTask {
   Timer statsUpdater;
 
   Completer _stopStreamCompleter = Completer();
-  Future _streamComplete()
-  {
-    if(_stopStreamCompleter.isCompleted)
-      _stopStreamCompleter = Completer();
+  Future _streamComplete() {
+    if (_stopStreamCompleter.isCompleted) _stopStreamCompleter = Completer();
     return _stopStreamCompleter.future;
   }
 
-  void updateSongInfo() async
-  {
-    if(radioControlService == null)
-      return;
+  void updateSongInfo() async {
+    if (radioControlService == null) return;
 
     List<String> songInfo = await radioControlService.updateStats();
     String curSongAuthor = "Radio Stream";
     String curSongTitle = "Loading...";
 
-    if(songInfo.length > 0)
+    if (songInfo.length > 0)
       curSongAuthor = songInfo[0];
     else
       curSongAuthor = "";
 
-    if(songInfo.length > 1)
+    if (songInfo.length > 1)
       curSongTitle = songInfo[1];
     else
       curSongTitle = "";
 
-    if(prevAuthor != curSongAuthor || prevTitle != curSongTitle)
-    {
+    if (prevAuthor != curSongAuthor || prevTitle != curSongTitle) {
       prevAuthor = curSongAuthor;
       prevTitle = curSongTitle;
       curSong = MediaItem(id: "NA", album: "None", title: curSongTitle, artist: curSongAuthor);
@@ -83,28 +79,24 @@ class BGAudioTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStart() async {
+    //Begin the constantly updating stream
+    statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
+      updateSongInfo();
+    });
 
-      //Begin the constantly updating stream
-      statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
-        updateSongInfo();
-      });
+    AudioServiceBackground.setState(
+      controls: [playControl, stopControl],
+      basicState: BasicPlaybackState.paused,
+    );
 
-      AudioServiceBackground.setState(        
-        controls: [playControl,stopControl],
-        basicState: BasicPlaybackState.paused,
-      );
-
-      await _streamComplete();    //Begin the constantly updating stream
+    await _streamComplete(); //Begin the constantly updating stream
   }
 
   @override
   void onStop() {
+    if (_basicState == BasicPlaybackState.stopped) return;
 
-    if (_basicState == BasicPlaybackState.stopped) 
-      return;
-
-    if(statsUpdater != null)
-      statsUpdater.cancel();
+    if (statsUpdater != null) statsUpdater.cancel();
 
     AudioServiceBackground.setState(
       controls: [],
@@ -113,11 +105,12 @@ class BGAudioTask extends BackgroundAudioTask {
     radioControlService.stopRadio();
     _stopStreamCompleter.complete();
   }
+
   @override
   void onPlay() {
-
     playPause();
   }
+
   @override
   void onPause() {
     playPause();
@@ -129,36 +122,29 @@ class BGAudioTask extends BackgroundAudioTask {
   }
 
   @override
-  void onSeekTo(int pos) async
-  {
-    if(pos >= 0 && pos < streamURLs.length && radioControlService != null)
-    {
-      await radioControlService.changeChannels(streamURLs[pos], statsURLs[pos]);
+  void onSeekTo(int pos) async {
+    if (pos >= 0 && pos < streamURLs.length && radioControlService != null) {
+      await radioControlService.changeChannels(streamURLs[pos], statsURLs[pos], statsTypes[pos]);
     }
-  
+
     updateSongInfo();
   }
 
-  Future<void> playPause() async
-  {
-    if(radioControlService == null)
-      return;
+  Future<void> playPause() async {
+    if (radioControlService == null) return;
 
     await radioControlService.onPlayPausePress();
 
-    if (radioControlService.isPlaying)
-    {
+    if (radioControlService.isPlaying) {
       //Perform playing operation
       await AudioServiceBackground.setState(
         controls: [pauseControl, stopControl],
         basicState: BasicPlaybackState.playing,
       );
-    }
-    else
-    {
+    } else {
       //Perform pausing operation
       await AudioServiceBackground.setState(
-        controls: [playControl,stopControl],
+        controls: [playControl, stopControl],
         basicState: BasicPlaybackState.paused,
       );
     }
