@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'dart:math';
 import 'package:flutter/services.dart';
 
 import 'package:audio_service/audio_service.dart';
@@ -12,19 +10,15 @@ import 'pages/contact_page.dart';
 
 import 'package:voice_of_pilgrim/services/bg_audio_task.dart';
 
-
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
-  MyApp()
-  {
+  MyApp() {
     setupSingleton();
   }
 
-  
   final Map<int, Color> colorCodes = {
     50: Color.fromRGBO(59, 61, 126, .1),
     100: Color.fromRGBO(59, 61, 126, .2),
@@ -41,7 +35,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     // Green color code: FF93cd48
     MaterialColor customColor = MaterialColor(0xFF323d7e, colorCodes);
 
@@ -53,14 +46,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Pilgrim Radio',
       theme: ThemeData(
-        primarySwatch: customColor,//Color.fromRGBO(50, 61, 126, 1.0),
+        primarySwatch: customColor, //Color.fromRGBO(50, 61, 126, 1.0),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: AudioServiceWidget(
-        child: MyHomePage(
-          title: 'The Voice of Pilgrim'
-        )
-      ),
+      home: AudioServiceWidget(child: MyHomePage(title: 'The Voice of Pilgrim')),
     );
   }
 }
@@ -79,8 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   int latestRadioChannel = -1;
 
-  void setUpMedia() async
-  {
+  void setUpMedia() async {
     await AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
     AudioService.seekTo(_currentIndex);
     latestRadioChannel = _currentIndex;
@@ -94,43 +82,34 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    try
-    {
+    try {
       AudioService.stop();
-    }
-    catch(e)
-    {
+    } catch (e) {
       print("Could not stop player!");
     }
     super.dispose();
   }
 
-  void onTabTapped(int index) async
-  {
+  void onTabTapped(int index) async {
     //prevents sound pause when pressing on the currently open tab
-    if(_currentIndex == index)
-      return;
+    if (_currentIndex == index) return;
 
-    if(index == 0 || index == 1)
-    {
+    if (index == 0 || index == 1) {
       //prevents pause when going from feedback to playing radio
-      if(latestRadioChannel != index)
-      {
+      if (latestRadioChannel != index) {
         AudioService.seekTo(index);
       }
       latestRadioChannel = index;
     }
-    setState(() {_currentIndex = index;});
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
-  void onQuitApp()
-  {
-    try
-    {
+  void onQuitApp() {
+    try {
       AudioService.stop();
-    }
-    catch(e)
-    {
+    } catch (e) {
       print("Could not stop player!");
     }
     SystemChannels.platform.invokeMethod('SystemNavigator.pop');
@@ -149,45 +128,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Scaffold(
                   appBar: AppBar(
                     title: Center(
-                      child: Text(widget.title,
+                      child: Text(
+                        widget.title,
                         textAlign: TextAlign.center,
-                        ),
+                      ),
                     ),
                     actions: <Widget>[
                       // action button
-                      IconButton(
-                        icon: Icon(Icons.power_settings_new),
-                        onPressed:onQuitApp
-                      ),
+                      IconButton(icon: Icon(Icons.power_settings_new), onPressed: onQuitApp),
                     ],
                   ),
                   body: Column(
                     children: [
                       Visibility(
                         visible: _currentIndex == 0 || _currentIndex == 1,
-                        child: ChannelPage(mediaSnapshot:mediaSnapshot.data, stateSnapshot:stateSnapshot.data, channelID:_currentIndex),
+                        child: ChannelPage(mediaSnapshot: mediaSnapshot.data, stateSnapshot: stateSnapshot.data, channelID: _currentIndex),
                       ),
                       Visibility(
                         visible: _currentIndex == 2,
                         child: ContactPage(),
                       ),
                     ],
-                  ), 
+                  ),
                   bottomNavigationBar: BottomNavigationBar(
                     currentIndex: _currentIndex,
                     onTap: onTabTapped,
                     items: [
                       BottomNavigationBarItem(
                         icon: Icon(Icons.radio),
-                        title: new Text("Main Radio"),
+                        label: "Main Radio",
                       ),
                       BottomNavigationBarItem(
                         icon: new Icon(FontAwesomeIcons.broadcastTower),
-                        title: new Text("Youth Radio"),
+                        label: "Youth Radio",
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.feedback),
-                        title: Text("Contact Us")
+                        label: "Contact Us",
                       )
                     ],
                   ),
@@ -195,7 +172,6 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           );
-        }
-    );
+        });
   }
 }
