@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:voice_of_pilgrim/services/general_info_service.dart';
 import 'services/locator.dart';
 
 import 'pages/channel_page.dart';
@@ -10,15 +11,14 @@ import 'pages/contact_page.dart';
 
 import 'package:voice_of_pilgrim/services/bg_audio_task.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupSingleton();
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp() {
-    setupSingleton();
-  }
-
   final Map<int, Color> colorCodes = {
     50: Color.fromRGBO(59, 61, 126, .1),
     100: Color.fromRGBO(59, 61, 126, .2),
@@ -69,7 +69,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int latestRadioChannel = -1;
 
   void setUpMedia() async {
-    await AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
+    await AudioService.start(
+      backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint,
+    );
     AudioService.seekTo(_currentIndex);
     latestRadioChannel = _currentIndex;
   }

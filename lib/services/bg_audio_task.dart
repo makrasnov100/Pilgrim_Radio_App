@@ -3,12 +3,15 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:voice_of_pilgrim/services/general_info_service.dart';
 import 'package:voice_of_pilgrim/services/radio_control_service.dart';
 
 enum StatsType { xml, json }
 
 void myBackgroundAudioTaskEntrypoint() {
-  AudioServiceBackground.run(() => BGAudioTask());
+  AudioServiceBackground.run(
+    () => BGAudioTask(),
+  );
 }
 
 MediaControl playControl = MediaControl(
@@ -28,13 +31,29 @@ MediaControl stopControl = MediaControl(
 );
 
 class BGAudioTask extends BackgroundAudioTask {
-  //TODO: figure out how to not make this hard coded
   //Stream info
-  List<String> streamURLs = ["http://37.187.112.164:8000/stream", "http://ca.rcast.net:8010/stream"];
-  List<String> statsURLs = ["http://37.187.112.164:8000/status-json.xsl", "http://ca.rcast.net:8010/stats"];
-  List<StatsType> statsTypes = [StatsType.json, StatsType.xml];
+  List<String> streamURLs = ["", ""];
+  List<String> statsURLs = ["", ""];
 
+  //Radio control
+  Completer<bool> streamsInitialized = Completer<bool>();
+  GeneralInfoService generalInfoService;
   RadioControlService radioControlService = RadioControlService();
+  Future<void> initStream() async {
+    generalInfoService = GeneralInfoService();
+    await generalInfoService.initializeService();
+    streamURLs = [generalInfoService.russianServerStreamURL, generalInfoService.englishServerStreamURL];
+    statsURLs = [generalInfoService.russianServerStatsURL, generalInfoService.englishServerStatsURL];
+    await radioControlService.changeChannels(streamURLs[0], statsURLs[0], statsTypes[0]);
+    streamsInitialized.complete(true);
+  }
+
+  BGAudioTask() {
+    initStream();
+  }
+
+  List<StatsType> statsTypes = [StatsType.xml, StatsType.xml];
+
   String prevTitle = "";
   String prevAuthor = "";
 
@@ -79,6 +98,9 @@ class BGAudioTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStart() async {
+    //Wait for the radio stream to load
+    await streamsInitialized.future;
+
     //Begin the constantly updating stream
     statsUpdater = Timer.periodic(new Duration(seconds: 5), (timer) {
       updateSongInfo();
@@ -127,6 +149,7 @@ class BGAudioTask extends BackgroundAudioTask {
       await radioControlService.changeChannels(streamURLs[pos], statsURLs[pos], statsTypes[pos]);
     }
 
+    await streamsInitialized.future;
     updateSongInfo();
   }
 
