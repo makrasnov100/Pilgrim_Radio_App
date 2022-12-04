@@ -49,8 +49,7 @@ class MyApp extends StatelessWidget {
 
 class MainScreen extends StatelessWidget {
   /// Tracks the position while the user drags the seek bar.
-  final BehaviorSubject<double> _dragPositionSubject =
-      BehaviorSubject.seeded(null);
+  final BehaviorSubject<double> _dragPositionSubject = BehaviorSubject.seeded(null);
 
   @override
   Widget build(BuildContext context) {
@@ -77,16 +76,12 @@ class MainScreen extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.skip_previous),
                         iconSize: 64.0,
-                        onPressed: mediaItem == queue.first
-                            ? null
-                            : AudioService.skipToPrevious,
+                        onPressed: mediaItem == queue.first ? null : AudioService.skipToPrevious,
                       ),
                       IconButton(
                         icon: Icon(Icons.skip_next),
                         iconSize: 64.0,
-                        onPressed: mediaItem == queue.last
-                            ? null
-                            : AudioService.skipToNext,
+                        onPressed: mediaItem == queue.last ? null : AudioService.skipToNext,
                       ),
                     ],
                   ),
@@ -116,11 +111,9 @@ class MainScreen extends StatelessWidget {
                       stopButton(),
                     ],
                   ),
-                if (basicState != BasicPlaybackState.none &&
-                    basicState != BasicPlaybackState.stopped) ...[
+                if (basicState != BasicPlaybackState.none && basicState != BasicPlaybackState.stopped) ...[
                   positionIndicator(mediaItem, state),
-                  Text("State: " +
-                      "$basicState".replaceAll(RegExp(r'^.*\.'), '')),
+                  Text("State: " + "$basicState".replaceAll(RegExp(r'^.*\.'), '')),
                   StreamBuilder(
                     stream: AudioService.customEventStream,
                     builder: (context, snapshot) {
@@ -138,15 +131,13 @@ class MainScreen extends StatelessWidget {
 
   /// Encapsulate all the different data we're interested in into a single
   /// stream so we don't have to nest StreamBuilders.
-  Stream<ScreenState> get _screenStateStream =>
-      Rx.combineLatest3<List<MediaItem>, MediaItem, PlaybackState, ScreenState>(
-          AudioService.queueStream,
-          AudioService.currentMediaItemStream,
-          AudioService.playbackStateStream,
-          (queue, mediaItem, playbackState) =>
-              ScreenState(queue, mediaItem, playbackState));
+  Stream<ScreenState> get _screenStateStream => Rx.combineLatest3<List<MediaItem>, MediaItem, PlaybackState, ScreenState>(
+      AudioService.queueStream,
+      AudioService.currentMediaItemStream,
+      AudioService.playbackStateStream,
+      (queue, mediaItem, playbackState) => ScreenState(queue, mediaItem, playbackState));
 
-  RaisedButton audioPlayerButton() => startButton(
+  ElevatedButton audioPlayerButton() => startButton(
         'AudioPlayer',
         () {
           AudioService.start(
@@ -159,7 +150,7 @@ class MainScreen extends StatelessWidget {
         },
       );
 
-  RaisedButton textToSpeechButton() => startButton(
+  ElevatedButton textToSpeechButton() => startButton(
         'TextToSpeech',
         () {
           AudioService.start(
@@ -171,8 +162,7 @@ class MainScreen extends StatelessWidget {
         },
       );
 
-  RaisedButton startButton(String label, VoidCallback onPressed) =>
-      RaisedButton(
+  ElevatedButton startButton(String label, VoidCallback onPressed) => ElevatedButton(
         child: Text(label),
         onPressed: onPressed,
       );
@@ -199,9 +189,7 @@ class MainScreen extends StatelessWidget {
     double seekPos;
     return StreamBuilder(
       stream: Rx.combineLatest2<double, double, double>(
-          _dragPositionSubject.stream,
-          Stream.periodic(Duration(milliseconds: 200)),
-          (dragPosition, _) => dragPosition),
+          _dragPositionSubject.stream, Stream.periodic(Duration(milliseconds: 200)), (dragPosition, _) => dragPosition),
       builder: (context, snapshot) {
         double position = snapshot.data ?? state.currentPosition.toDouble();
         double duration = mediaItem?.duration?.toDouble();
@@ -255,8 +243,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       title: "A Salute To Head-Scratching Science",
       artist: "Science Friday and WNYC Studios",
       duration: 5739820,
-      artUri:
-          "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
+      artUri: "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
     ),
     MediaItem(
       id: "https://s3.amazonaws.com/scifri-segments/scifri201711241.mp3",
@@ -264,8 +251,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
       title: "From Cat Rheology To Operatic Incompetence",
       artist: "Science Friday and WNYC Studios",
       duration: 2856950,
-      artUri:
-          "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
+      artUri: "https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg",
     ),
   ];
   int _queueIndex = -1;
@@ -305,9 +291,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   @override
   Future<void> onStart() async {
-    var playerStateSubscription = _audioPlayer.playbackStateStream
-        .where((state) => state == AudioPlaybackState.completed)
-        .listen((state) {
+    var playerStateSubscription = _audioPlayer.playbackStateStream.where((state) => state == AudioPlaybackState.completed).listen((state) {
       _handlePlaybackCompleted();
     });
     var eventSubscription = _audioPlayer.playbackEventStream.listen((event) {
@@ -361,9 +345,7 @@ class AudioPlayerTask extends BackgroundAudioTask {
     // Load next item
     _queueIndex = newPos;
     AudioServiceBackground.setMediaItem(mediaItem);
-    _skipState = offset > 0
-        ? BasicPlaybackState.skippingToNext
-        : BasicPlaybackState.skippingToPrevious;
+    _skipState = offset > 0 ? BasicPlaybackState.skippingToNext : BasicPlaybackState.skippingToPrevious;
     await _audioPlayer.setUrl(mediaItem.id);
     _skipState = null;
     // Resume playback if we were playing
@@ -424,19 +406,9 @@ class AudioPlayerTask extends BackgroundAudioTask {
 
   List<MediaControl> getControls(BasicPlaybackState state) {
     if (_playing) {
-      return [
-        skipToPreviousControl,
-        pauseControl,
-        stopControl,
-        skipToNextControl
-      ];
+      return [skipToPreviousControl, pauseControl, stopControl, skipToNextControl];
     } else {
-      return [
-        skipToPreviousControl,
-        playControl,
-        stopControl,
-        skipToNextControl
-      ];
+      return [skipToPreviousControl, playControl, stopControl, skipToNextControl];
     }
   }
 }
@@ -468,11 +440,9 @@ class TextPlayerTask extends BackgroundAudioTask {
       AudioServiceBackground.androidForceEnableMediaButtons();
       _tts.speak('$i');
       // Wait for the speech or a pause request.
-      await Future.any(
-          [Future.delayed(Duration(seconds: 1)), _playPauseFuture()]);
+      await Future.any([Future.delayed(Duration(seconds: 1)), _playPauseFuture()]);
       // If we were just paused...
-      if (_playPauseCompleter.isCompleted &&
-          _basicState == BasicPlaybackState.paused) {
+      if (_playPauseCompleter.isCompleted && _basicState == BasicPlaybackState.paused) {
         // Wait to be unpaused...
         await _playPauseFuture();
       }
@@ -480,11 +450,7 @@ class TextPlayerTask extends BackgroundAudioTask {
     if (_basicState != BasicPlaybackState.stopped) onStop();
   }
 
-  MediaItem mediaItem(int number) => MediaItem(
-      id: 'tts_$number',
-      album: 'Numbers',
-      title: 'Number $number',
-      artist: 'Sample Artist');
+  MediaItem mediaItem(int number) => MediaItem(id: 'tts_$number', album: 'Numbers', title: 'Number $number', artist: 'Sample Artist');
 
   void playPause() {
     if (_basicState == BasicPlaybackState.playing) {

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:http/http.dart';
@@ -11,7 +10,6 @@ class ContactPage extends StatefulWidget {
 }
 
 class _ContactPageState extends State<ContactPage> {
-
   final _formKey = GlobalKey<FormState>();
   String selectedFavorite = "";
   int selectedFavoriteNum = -1;
@@ -24,47 +22,45 @@ class _ContactPageState extends State<ContactPage> {
   TextEditingController nameInputController = TextEditingController();
   TextEditingController ageInputController = TextEditingController();
 
-  String getFavoriteEntry(int index)
-  {
+  String getFavoriteEntry(int index) {
     String result = "&entry.1591633300=";
-    if(index == 0)
+    if (index == 0)
       result += "%D0%9F%D0%B5%D1%81%D0%BD%D0%B8";
-    else if(index == 1)
+    else if (index == 1)
       result += "%D0%A1%D1%82%D0%B8%D1%85%D0%B8";
-    else if(index == 2)
+    else if (index == 2)
       result += "%D0%9F%D1%80%D0%BE%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%B8";
-    else if(index == 3)
+    else if (index == 3)
       result += "%D0%9C%D0%B8%D0%BD%D0%B8+%D0%BF%D1%80%D0%BE%D0%BF%D0%BE%D0%B2%D0%B5%D0%B4%D0%B8";
-    else if(index == 4)
-      result += "%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87%D0%B8+%D1%81+%D1%83%D1%87%D0%B0%D1%81%D1%82%D0%B8%D0%B5%D0%BC+%D0%B2%D0%B5%D0%B4%D1%83%D1%89%D0%B8%D1%85";
-    else if(index == 5)
-      result += "%D0%91%D0%B5%D1%81%D0%B5%D0%B4%D1%8B+%D1%81%D0%BE+%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D1%82%D0%B5%D0%BB%D1%8F%D0%BC%D0%B8+%D0%B8+%D0%BF%D0%B0%D1%81%D1%82%D1%8B%D1%80%D1%8F%D0%BC%D0%B8";
+    else if (index == 4)
+      result +=
+          "%D0%9F%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87%D0%B8+%D1%81+%D1%83%D1%87%D0%B0%D1%81%D1%82%D0%B8%D0%B5%D0%BC+%D0%B2%D0%B5%D0%B4%D1%83%D1%89%D0%B8%D1%85";
+    else if (index == 5)
+      result +=
+          "%D0%91%D0%B5%D1%81%D0%B5%D0%B4%D1%8B+%D1%81%D0%BE+%D1%81%D0%BB%D1%83%D0%B6%D0%B8%D1%82%D0%B5%D0%BB%D1%8F%D0%BC%D0%B8+%D0%B8+%D0%BF%D0%B0%D1%81%D1%82%D1%8B%D1%80%D1%8F%D0%BC%D0%B8";
     else
       return "";
-    
+
     return result;
   }
 
-  void sendFeedback() async
-  {
+  void sendFeedback() async {
     //Perform content checks
     String error = "";
-    if(feedbackInputController.text == "")
-    {
+    if (feedbackInputController.text == "") {
       error = "Пожалуйста, введите отзыв.";
-    }
-    else if(selectedFavorite == "")
-    {
+    } else if (selectedFavorite == "") {
       error = "Пожалуйста, выберете что вы бы хотели слушать больше.";
     }
 
-    if(error != "")
-    {
-      final snackBar = SnackBar(content: Text(error), backgroundColor: Colors.redAccent, duration: Duration(seconds: 3),);
-      Scaffold.of(context).showSnackBar(snackBar);
-    } 
-    else
-    {
+    if (error != "") {
+      final snackBar = SnackBar(
+        content: Text(error),
+        backgroundColor: Colors.redAccent,
+        duration: Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
       //Send out the form content to google form
       String feedbackText = feedbackInputController.text;
       String top40Text = top40InputController.text;
@@ -103,19 +99,22 @@ class _ContactPageState extends State<ContactPage> {
       ageInputController.clear();
       FocusScope.of(context).requestFocus(new FocusNode());
 
-      final snackBar = SnackBar(content: Text("Спасибо за поддержку!"), backgroundColor: Colors.green, duration: Duration(seconds: 3),);
-      Scaffold.of(context).showSnackBar(snackBar);
+      final snackBar = SnackBar(
+        content: Text("Спасибо за поддержку!"),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
-  void onChangeRadioSelection(String newValue)
-  {
+  void onChangeRadioSelection(String newValue) {
     setState(() {
       selectedFavorite = newValue;
     });
   }
-  void onChangeRadioSelectionNum(String label, int index)
-  {
+
+  void onChangeRadioSelectionNum(String label, int index) {
     selectedFavoriteNum = index;
   }
 
@@ -134,134 +133,124 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            radius: 2,
-            colors: [Color.fromARGB(255, 240, 240, 240), Color.fromARGB(255, 183, 187, 210)],
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              radius: 2,
+              colors: [Color.fromARGB(255, 240, 240, 240), Color.fromARGB(255, 183, 187, 210)],
+            ),
           ),
-        ),
-        child: SingleChildScrollView(
-          controller: _pageScrollControl,
-          child: Padding(
+          child: SingleChildScrollView(
+            controller: _pageScrollControl,
+            child: Padding(
               padding: EdgeInsets.all(20),
               child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text('Опрос слушателей радио\n"Голос Пилигрима"',
-                        style: Theme.of(context).textTheme.headline5,
-                        textAlign: TextAlign.center,
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          'Опрос слушателей радио\n"Голос Пилигрима"',
+                          style: Theme.of(context).textTheme.headline5,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:10),
-                    Center(
-                        child: Text("Нам важно ваше мнение, пожалуйста оставьте короткий отзыв что вы думаете об радио.",
-                        textAlign: TextAlign.center,
+                      SizedBox(height: 10),
+                      Center(
+                        child: Text(
+                          "Нам важно ваше мнение, пожалуйста оставьте короткий отзыв что вы думаете об радио.",
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:30),
-                    Text("Отзыв:",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontWeight: FontWeight.w700)
-                    ),
-                    SizedBox(height:5),
-                    TextFormField(
-                      maxLines: 5,
-                      controller: feedbackInputController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white60,
+                      SizedBox(height: 30),
+                      Text("Отзыв:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.w700)),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        maxLines: 5,
+                        controller: feedbackInputController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white60,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:20),
-                    Text("Что вы хотели бы слушать больше на радио 'Голос Пилигрима'?",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontWeight: FontWeight.w700)
-                    ),
-                    RadioButtonGroup(
-                      onChange: onChangeRadioSelectionNum,
-                      picked: selectedFavorite,
-                      labels: <String>[
-                        "Песни",
-                        "Стихи",
-                        "Проповеди",
-                        "Мини проповеди",
-                        "Передачи с участием ведущих",
-                        "Беседы со служителями и пастырями",
-                      ],
-                      onSelected: onChangeRadioSelection
-                    ),
-                    SizedBox(height:20),
-                    Text("Top 40 | Напишите любимого исполнителя и название песни ниже:",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontWeight: FontWeight.w700)
-                    ),
-                    SizedBox(height:5),
-                    TextFormField(
-                      controller: top40InputController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white60,
+                      SizedBox(height: 20),
+                      Text("Что вы хотели бы слушать больше на радио 'Голос Пилигрима'?",
+                          textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.w700)),
+                      RadioButtonGroup(
+                          onChange: onChangeRadioSelectionNum,
+                          picked: selectedFavorite,
+                          labels: <String>[
+                            "Песни",
+                            "Стихи",
+                            "Проповеди",
+                            "Мини проповеди",
+                            "Передачи с участием ведущих",
+                            "Беседы со служителями и пастырями",
+                          ],
+                          onSelected: onChangeRadioSelection),
+                      SizedBox(height: 20),
+                      Text("Top 40 | Напишите любимого исполнителя и название песни ниже:",
+                          textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.w700)),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        controller: top40InputController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white60,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:20),
-                    Text("Предложения для улучшения радио:",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontWeight: FontWeight.w700)
-                    ),
-                    SizedBox(height:5),
-                    TextFormField(
-                      controller: suggestionInputController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white60,
+                      SizedBox(height: 20),
+                      Text("Предложения для улучшения радио:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.w700)),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        controller: suggestionInputController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white60,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:20),
-                    Text("Имя:",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontWeight: FontWeight.w700)
-                    ),
-                    SizedBox(height:5),
-                    TextFormField(
-                      controller: nameInputController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white60,
+                      SizedBox(height: 20),
+                      Text("Имя:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.w700)),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        controller: nameInputController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white60,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:20),
-                    Text("Возраст:",
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontWeight: FontWeight.w700)
-                    ),
-                    SizedBox(height:5),
-                    TextFormField(
-                      controller: ageInputController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white60,
+                      SizedBox(height: 20),
+                      Text("Возраст:", textAlign: TextAlign.left, style: TextStyle(fontWeight: FontWeight.w700)),
+                      SizedBox(height: 5),
+                      TextFormField(
+                        controller: ageInputController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white60,
+                        ),
                       ),
-                    ),
-                    SizedBox(height:10),
-                    Container(
-                      width: double.infinity,
-                      child: RaisedButton(
-                        child: Text("Отослать Отзыв"),
-                        onPressed: sendFeedback,
-                        color: Color.fromARGB(220, 59, 61, 126),
-                        textColor: Colors.white,
+                      SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          child: Text("Отослать Отзыв"),
+                          onPressed: sendFeedback,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Color.fromARGB(220, 59, 61, 126),
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32.0),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    SizedBox(height:10),
-                  ],
-                )
-              ),
+                      SizedBox(height: 10),
+                    ],
+                  )),
             ),
-          )
-      ),
+          )),
     );
   }
 }

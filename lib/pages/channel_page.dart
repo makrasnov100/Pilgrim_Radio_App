@@ -1,4 +1,3 @@
-
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
@@ -22,117 +21,94 @@ class ChannelPage extends StatefulWidget {
   var state = _ChannelPageState();
 
   @override
-  _ChannelPageState createState()
-  {
+  _ChannelPageState createState() {
     return this.state = _ChannelPageState();
   }
 }
 
 class _ChannelPageState extends State<ChannelPage> {
-
   bool isCanChangePlayState = true;
   String curSongAuthor = "Radio Stream";
   String curSongTitle = "Loading...";
 
-  bool isStreaming({MediaItem curMedia, PlaybackState curState})
-  {
+  bool isStreaming({MediaItem curMedia, PlaybackState curState}) {
     curSongAuthor = curMedia.artist;
     curSongTitle = curMedia.title;
-    if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && (curState != null && curState.basicState != BasicPlaybackState.none))
-    {
+    if (curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && (curState != null && curState.basicState != BasicPlaybackState.none)) {
       return true;
     }
-    if(curState != null && curState.basicState == BasicPlaybackState.stopped)
-    {
+    if (curState != null && curState.basicState == BasicPlaybackState.stopped) {
       return true;
     }
     return false;
   }
 
-
-  void onPlayPausePress() async
-  {
-    if(curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && isCanChangePlayState)
-    {
+  void onPlayPausePress() async {
+    if (curSongTitle != "Unavaliable" && curSongTitle != "Loading..." && isCanChangePlayState) {
       isCanChangePlayState = false;
 
-      if (widget.stateSnapshot == null)
-      {
+      if (widget.stateSnapshot == null) {
         await AudioService.start(backgroundTaskEntrypoint: myBackgroundAudioTaskEntrypoint);
         AudioService.seekTo(widget.channelID);
-        Future.delayed(const Duration(seconds: 1), () 
-        {
+        Future.delayed(const Duration(seconds: 1), () {
           isCanChangePlayState = true;
         });
-      } else if (widget.stateSnapshot.basicState == BasicPlaybackState.paused ||
-                 widget.stateSnapshot.basicState == BasicPlaybackState.playing)
-      {
+      } else if (widget.stateSnapshot.basicState == BasicPlaybackState.paused || widget.stateSnapshot.basicState == BasicPlaybackState.playing) {
         AudioService.play();
-        Future.delayed(const Duration(seconds: 1), () 
-        {
+        Future.delayed(const Duration(seconds: 1), () {
           isCanChangePlayState = true;
         });
       }
     }
   }
 
-  String getChannelType()
-  {
+  String getChannelType() {
     // Todo: make a service that consolidates this type of info
     String channelType = "russian";
-    if(widget.channelID == 1)
-      channelType = "english";
+    if (widget.channelID == 1) channelType = "english";
     return channelType;
   }
 
-  void onDislikeSong() async
-  {
+  void onDislikeSong() async {
     String channelType = getChannelType();
-    await getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, false);
+    await getIt<LikeDislikeService>().onRateSong(curSongAuthor + "|" + curSongTitle + '|' + channelType, false);
     setState(() {});
   }
 
-  void onLikeSong() async
-  {
+  void onLikeSong() async {
     String channelType = getChannelType();
-    await getIt<LikeDislikeService>().onRateSong(curSongAuthor+"|"+curSongTitle+'|'+channelType, true);
+    await getIt<LikeDislikeService>().onRateSong(curSongAuthor + "|" + curSongTitle + '|' + channelType, true);
     setState(() {});
   }
 
-  Widget getFloatButton(PlaybackState curState)
-  {
+  Widget getFloatButton(PlaybackState curState) {
     //Find correct Play and Rate button apearence
     Icon curIcon = Icon(Icons.play_arrow);
 
-
-    if(curState.basicState == BasicPlaybackState.playing)
-    {
+    if (curState.basicState == BasicPlaybackState.playing) {
       //play
       curIcon = Icon(Icons.pause);
     }
-    if(curState.basicState == BasicPlaybackState.stopped)
-    {
+    if (curState.basicState == BasicPlaybackState.stopped) {
       //play
       curIcon = Icon(Icons.sync);
     }
 
     //Check if an option was already selected
-    String songFullName = curSongAuthor+"|"+curSongTitle+"|"+getChannelType();
+    String songFullName = curSongAuthor + "|" + curSongTitle + "|" + getChannelType();
     Color rateDownOutline = Colors.redAccent;
     Color rateUpOutline = Colors.green;
     Color rateDownInside = Colors.transparent;
     Color rateUpInside = Colors.transparent;
     Color rateUpIcon = Colors.green;
     Color rateDownIcon = Colors.redAccent;
-    if(getIt<LikeDislikeService>().ratedSongs.containsKey(songFullName))
-    {
-      if(getIt<LikeDislikeService>().ratedSongs[songFullName].isGood)  //song already rated as good
+    if (getIt<LikeDislikeService>().ratedSongs.containsKey(songFullName)) {
+      if (getIt<LikeDislikeService>().ratedSongs[songFullName].isGood) //song already rated as good
       {
         rateUpOutline = Colors.black;
         rateUpIcon = Colors.white;
         rateUpInside = Colors.green;
-      }
-      else //song already rated as bad
+      } else //song already rated as bad
       {
         rateDownOutline = Colors.black;
         rateDownIcon = Colors.white;
@@ -150,26 +126,27 @@ class _ChannelPageState extends State<ChannelPage> {
               width: SizeConfig.screenWidth,
               child: Row(
                 children: [
-                  Spacer(flex:4),
+                  Spacer(flex: 4),
                   Visibility(
                     visible: curState.basicState == BasicPlaybackState.playing,
                     child: SizedBox(
                       width: 60,
                       height: 60,
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: onDislikeSong,
-                        color: rateDownInside,
-                        shape: CircleBorder(
-                          side: BorderSide(color: rateDownOutline, width: 4),
+                        style: TextButton.styleFrom(
+                          backgroundColor: rateDownInside,
+                          shape: CircleBorder(side: BorderSide(color: rateDownOutline, width: 4)),
                         ),
                         child: Icon(
-                          Icons.thumb_down, 
+                          Icons.thumb_down,
                           size: SizeConfig.safeBlockVertical * 3,
-                          color: rateDownIcon,),
+                          color: rateDownIcon,
+                        ),
                       ),
                     ),
                   ),
-                  Spacer(flex:1),
+                  Spacer(flex: 1),
                   Container(
                     width: 80,
                     child: FittedBox(
@@ -177,30 +154,27 @@ class _ChannelPageState extends State<ChannelPage> {
                         onPressed: onPlayPausePress,
                         tooltip: 'Play/Pause',
                         child: curIcon,
-                        backgroundColor: Color.fromARGB(220, 59, 61, 126),//Theme.of(context).backgroundColor,
+                        backgroundColor: Color.fromARGB(220, 59, 61, 126), //Theme.of(context).backgroundColor,
                       ),
                     ),
                   ),
-                  Spacer(flex:1),
+                  Spacer(flex: 1),
                   Visibility(
                     visible: curState.basicState == BasicPlaybackState.playing,
                     child: SizedBox(
                       width: 60,
                       height: 60,
-                      child: FlatButton(
+                      child: TextButton(
                         onPressed: onLikeSong,
-                        color: rateUpInside,
-                        shape: CircleBorder(
-                          side: BorderSide(color: rateUpOutline, width: 4),
+                        style: TextButton.styleFrom(
+                          backgroundColor: rateUpInside,
+                          shape: CircleBorder(side: BorderSide(color: rateUpOutline, width: 4)),
                         ),
-                        child: Icon(
-                          Icons.thumb_up, 
-                          size: SizeConfig.safeBlockVertical * 3,
-                          color: rateUpIcon),
+                        child: Icon(Icons.thumb_up, size: SizeConfig.safeBlockVertical * 3, color: rateUpIcon),
                       ),
                     ),
                   ),
-                  Spacer(flex:4),
+                  Spacer(flex: 4),
                 ],
               ),
             ),
@@ -211,7 +185,7 @@ class _ChannelPageState extends State<ChannelPage> {
   }
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
   }
 
@@ -224,13 +198,13 @@ class _ChannelPageState extends State<ChannelPage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context); //ui scaling object
     return Expanded(
-      child: Scaffold(
+        child: Scaffold(
       floatingActionButton: Visibility(
         visible: isStreaming(
-          curMedia: widget.mediaSnapshot??MediaItem(id: "NA", album: "None", title: "Stopped", artist: "Radio Stream"),
-          curState: widget.stateSnapshot??PlaybackState(basicState: BasicPlaybackState.stopped, actions: null),
+          curMedia: widget.mediaSnapshot ?? MediaItem(id: "NA", album: "None", title: "Stopped", artist: "Radio Stream"),
+          curState: widget.stateSnapshot ?? PlaybackState(basicState: BasicPlaybackState.stopped, actions: null),
         ),
-        child: getFloatButton(widget.stateSnapshot??PlaybackState(basicState: BasicPlaybackState.stopped, actions: null)),
+        child: getFloatButton(widget.stateSnapshot ?? PlaybackState(basicState: BasicPlaybackState.stopped, actions: null)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
@@ -250,14 +224,14 @@ class _ChannelPageState extends State<ChannelPage> {
                 child: Container(),
               ),
               Flexible(
-                flex:5,
+                flex: 5,
                 child: SizedBox(
                   height: SizeConfig.safeBlockVertical * 27,
                   child: Image.asset("assets/logo.png"),
                 ),
               ),
               Flexible(
-                flex:8,
+                flex: 8,
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Column(
@@ -266,25 +240,26 @@ class _ChannelPageState extends State<ChannelPage> {
                       Align(
                         alignment: Alignment.center,
                         child: FittedBox(
-                          fit:BoxFit.fitWidth,
+                          fit: BoxFit.fitWidth,
                           child: Text(
-                            (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "", artist:"Radio Stream")).artist,
+                            (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "", artist: "Radio Stream")).artist,
                             overflow: TextOverflow.ellipsis,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.headline4,
                           ),
                         ),
                       ),
-                      SizedBox(height: 5,),
+                      SizedBox(
+                        height: 5,
+                      ),
                       Align(
                         alignment: Alignment.center,
-                        child: Text(
-                          (widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Stopped", artist:"")).title,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline6
-                        ),
+                        child: Text((widget.mediaSnapshot ?? MediaItem(id: "", album: "", title: "Stopped", artist: "")).title,
+                            textAlign: TextAlign.center, style: Theme.of(context).textTheme.headline6),
                       ),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -294,28 +269,29 @@ class _ChannelPageState extends State<ChannelPage> {
                             link: "Christian Radio Station: http://thevoiceofpilgrim.org/",
                             isShare: true,
                           ),
-                          SizedBox(width:10), 
+                          SizedBox(width: 10),
                           CircularShareIconButton(
                             iconData: FontAwesomeIcons.facebookF,
                             color: Color.fromARGB(255, 66, 103, 178),
                             link: "https://www.facebook.com/golos.piligrima/",
                             isShare: false,
                           ),
-                          SizedBox(width:10),
+                          SizedBox(width: 10),
                           CircularShareIconButton(
                             iconData: FontAwesomeIcons.youtube,
                             color: Color.fromARGB(255, 255, 0, 0),
-                            link: "https://www.youtube.com/playlist?list=PLyY7Cd7wQj3QmUB2Y3X8rlNGfi39hjQkE&fbclid=IwAR1uIlhaFRubaxt72JiB3dgW_wNdrRuqa4NPUAXI4FeBYMRfTNY__MDr5UM",
+                            link:
+                                "https://www.youtube.com/playlist?list=PLyY7Cd7wQj3QmUB2Y3X8rlNGfi39hjQkE&fbclid=IwAR1uIlhaFRubaxt72JiB3dgW_wNdrRuqa4NPUAXI4FeBYMRfTNY__MDr5UM",
                             isShare: false,
                           ),
-                          SizedBox(width:10),
+                          SizedBox(width: 10),
                           CircularShareIconButton(
                             iconData: FontAwesomeIcons.odnoklassniki,
                             color: Color.fromARGB(255, 245, 130, 32),
                             link: "https://www.ok.ru/group/54576674570348",
                             isShare: false,
                           ),
-                          SizedBox(width:10),
+                          SizedBox(width: 10),
                           CircularShareIconButton(
                             iconData: FontAwesomeIcons.paypal,
                             color: Color.fromARGB(255, 0, 69, 124),
@@ -336,7 +312,6 @@ class _ChannelPageState extends State<ChannelPage> {
           ),
         ),
       ),
-    )
-  );
+    ));
   }
 }
