@@ -233,7 +233,10 @@ class _ContactPageState extends State<ContactPage> {
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(
-                          child: Text("Отослать Отзыв"),
+                          child: Text(
+                            "Отослать Отзыв",
+                            style: TextStyle(color: Colors.white),
+                          ),
                           onPressed: sendFeedback,
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Color.fromARGB(220, 59, 61, 126),
