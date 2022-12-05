@@ -238,8 +238,9 @@ class _ContactPageState extends State<ContactPage> {
                             style: TextStyle(color: Colors.white),
                           ),
                           onPressed: sendFeedback,
+                          
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Color.fromARGB(220, 59, 61, 126),
+                            primary: Color.fromARGB(220, 59, 61, 126),
                             textStyle: TextStyle(
                               color: Colors.white,
                             ),
