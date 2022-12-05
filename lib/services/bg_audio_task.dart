@@ -8,6 +8,7 @@ import 'package:voice_of_pilgrim/services/radio_control_service.dart';
 
 enum StatsType { xml, json }
 
+@pragma('vm:entry-point')
 void myBackgroundAudioTaskEntrypoint() {
   AudioServiceBackground.run(
     () => BGAudioTask(),
